@@ -1,3 +1,23 @@
+minigrid_novelty_generator/baselines/logs/*
+minigrid_novelty_generator/baselines/minigrid_cnn_logs/*
+*.pyc
+*__pycache__
+*egg-info
+trained_models
+
+# PyPI
+build/*
+dist/*
+.idea/
+
+# wandb
+*wandb*
+*videos*
+*runs*
+
+# Vim
+*.swp
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
