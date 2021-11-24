@@ -1,1 +1,1 @@
-from minigrid_novelty_generator.envs.multidoormultikey import *
+from novgrid.envs.multidoormultikey import *
