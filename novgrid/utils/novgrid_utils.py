@@ -1,6 +1,8 @@
 import gym_minigrid
 import gym
 
+from novgrid.novelty_generation.novelty_wrappers import NoveltyWrapper
+
 
 def make_env(env_name, log_dir, wrappers=[]):
     '''
@@ -10,10 +12,13 @@ def make_env(env_name, log_dir, wrappers=[]):
     '''
     def _init():
         env = gym.make(env_name)
-        env = gym_minigrid.wrappers.ImgObsWrapper(env)
         if wrappers:
             for wrapper in wrappers:
-                env = wrapper(env)
+                if issubclass(wrapper, NoveltyWrapper):
+                    env = wrapper(env, novelty_episode=10_000)
+                else:
+                    env = wrapper(env)
+        env = gym_minigrid.wrappers.ImgObsWrapper(env)
         # env = Monitor(env, log_dir)
         # obs = env.reset()
         return env

@@ -16,7 +16,6 @@ from novgrid.utils.novgrid_utils import make_env
 from novgrid.utils.baseline_utils import MinigridCNN
 from novgrid.novelty_generation.novelty_wrappers import *
 
-
 device = th.device('cuda' if th.cuda.is_available() else 'cpu')
 
 
@@ -43,25 +42,25 @@ def main(args):
 
     # Create environments
     # env_wrappers = [DoorKeyChange]
-    env_wrappers = []
+    env_wrappers = [DoorKeyNoveltyWrapper]
     env_list = [make_env(args.env, log_dir, wrappers=env_wrappers) for _ in range(args.num_workers)]
     env = VecMonitor(DummyVecEnv(env_list), filename=log_dir)
-    #env = DummyVecEnv([lambda: Monitor(CustomEnv(reward_func=FUNCTION), log_dir, allow_early_resets=True) for _ in range(num_cpu)])
+    # env = DummyVecEnv([lambda: Monitor(CustomEnv(reward_func=FUNCTION), log_dir, allow_early_resets=True) for _ in range(num_cpu)])
 
     # Set up and create model
     policy_kwargs = dict(
         features_extractor_class=MinigridCNN,
-        features_extractor_kwargs=dict(features_dim=128),)
-    model = PPO("CnnPolicy", 
-                env, 
+        features_extractor_kwargs=dict(features_dim=128), )
+    model = PPO("CnnPolicy",
+                env,
                 policy_kwargs=policy_kwargs,
                 learning_rate=args.learning_rate,
-                verbose=1, 
+                verbose=1,
                 tensorboard_log=log_dir,
                 device=device)
-    if args.load_model:
-        print(f'loading model{args.load_model}')
-        model.set_parameters(args.load_model)
+    # if args.load_model:
+    #     print(f'loading model {args.load_model}')
+    #     model.set_parameters(args.load_model)
 
     # Set up experiment callbacks
     eval_callback = EvalCallback(
@@ -77,7 +76,7 @@ def main(args):
             gradient_save_freq=1000,
             model_save_path=wandb_log,
             model_save_freq=10000,
-            verbose=2)
+            verbose=0)
         callback_list.append(tracking_callback)
     all_callback = CallbackList(callback_list)
 
@@ -85,11 +84,11 @@ def main(args):
     # TODO: this way of having multiple runs probably will not work with wandb, it will think its all one exp
     for exp in range(args.num_exp):
         model.learn(
-            total_timesteps=args.total_timesteps, 
-            tb_log_name='run_{}'.format(exp), 
+            total_timesteps=10000000,
+            tb_log_name='run_{}'.format(exp),
             callback=all_callback,
         )
-        model.save(log_dir+'/'+'run_{}'.format(exp)+'_final_model')
+        model.save(log_dir + '/' + 'run_{}'.format(exp) + '_final_model')
     if args.wandb_track:
         run.finish()
 

@@ -3,9 +3,10 @@ from gym_minigrid.minigrid import Key, Grid, Door, Goal, COLORS
 from gym_minigrid.register import register
 import numpy as np
 
+
 class MultiDoorMultiKeyEnv(DoorKeyEnv):
     def __init__(self, size=8, doors=2, keys=2, determ=False, seed=13):
-        if (doors > (size-3)) or (keys > (size-3)):
+        if (doors > (size - 3)) or (keys > (size - 3)):
             raise ValueError("Both doors:{} and keys:{} must be less than size-3:{}".format(doors, keys, size))
         elif doors > 6 or keys > 6:
             raise ValueError("Both doors:{} and keys:{} must be less than 6".format(doors, keys))
@@ -15,10 +16,10 @@ class MultiDoorMultiKeyEnv(DoorKeyEnv):
         self.determ = determ
         if self.determ:
             rand_num_gen = np.random.default_rng(self.seed)
-            self.door_idxs = rand_num_gen.choice(size-3, size=self.doors)+1
+            self.door_idxs = rand_num_gen.choice(size - 3, size=self.doors) + 1
             self.key_widths = rand_num_gen.choice(size, size=self.keys)
             self.key_heights = rand_num_gen.choice(size, size=self.keys)
-            self.split_idx = rand_num_gen.integers(low=2, high=size-2)
+            self.split_idx = rand_num_gen.integers(low=2, high=size - 2)
         super().__init__(size=16)
 
     def _gen_grid(self, width, height):
@@ -35,7 +36,7 @@ class MultiDoorMultiKeyEnv(DoorKeyEnv):
         if self.determ:
             split_idx = self.split_idx
         else:
-            split_idx = self._rand_int(2, width-2)
+            split_idx = self._rand_int(2, width - 2)
         self.grid.vert_wall(split_idx, 0)
 
         # Place the agent at a random position and orientation
@@ -52,7 +53,7 @@ class MultiDoorMultiKeyEnv(DoorKeyEnv):
             if self.determ:
                 door_idx = self.door_idxs[door]
             else:
-                door_idx = rand_num_gen.choice(height-3)+1
+                door_idx = rand_num_gen.choice(height - 3) + 1
             self.put_obj(Door(colors[door], is_locked=True), split_idx, door_idx)
 
         for key in range(self.keys):
