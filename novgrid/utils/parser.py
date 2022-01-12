@@ -18,6 +18,7 @@ def getparser():
     p.add('--num_exp', type=int, default=1, help='number of learning experiments per run')
     p.add('--learning_rate', type=float, default=1e-4, help='Learning rate for optimization')
     p.add('--num_workers', type=int, default=1, help='number of learning workers, and therefore environments')
+    p.add('--seed', type=int, default=13, help='seed for randomness')
     p.add('--debug', default=False, action='store_true')
     parsed_args = p.parse_args()
     print(parsed_args)
