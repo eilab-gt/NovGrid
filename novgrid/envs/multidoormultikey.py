@@ -12,15 +12,15 @@ class MultiDoorMultiKeyEnv(DoorKeyEnv):
             raise ValueError("Both doors:{} and keys:{} must be less than 6".format(doors, keys))
         self.doors = doors
         self.keys = keys
-        self.seed = seed
+        self.seed_value = seed
         self.determ = determ
         if self.determ:
-            rand_num_gen = np.random.default_rng(self.seed)
-            self.door_idxs = rand_num_gen.choice(size - 3, size=self.doors) + 1
+            rand_num_gen = np.random.default_rng(self.seed_value)
+            self.door_idxs = rand_num_gen.choice(size - 3, size=self.doors, replace=False) + 1
             self.key_widths = rand_num_gen.choice(size, size=self.keys)
             self.key_heights = rand_num_gen.choice(size, size=self.keys)
             self.split_idx = rand_num_gen.integers(low=2, high=size - 2)
-        super().__init__(size=16)
+        super().__init__(size=size)
 
     def _gen_grid(self, width, height):
         # Create an empty grid
@@ -45,57 +45,60 @@ class MultiDoorMultiKeyEnv(DoorKeyEnv):
 
         ## Place doors and keys
         ## Warning: for Python < 3.5 dict order is non-deterministic
-        colors = COLORS.keys()
-        rand_num_gen = np.random.default_rng(self.seed)
+        colors = list(COLORS.keys())
+        rand_num_gen = np.random.default_rng(self.seed_value)
         # place_obj drops the object randomly in a rectangle
         # put_obj puts an object in a specific place
         for door in range(self.doors):
             if self.determ:
                 door_idx = self.door_idxs[door]
             else:
-                door_idx = rand_num_gen.choice(height - 3) + 1
+                door_idx = None
+                while not door_idx or isinstance(self.grid.get(split_idx, door_idx), Door):
+                  door_idx = rand_num_gen.choice(height - 3) + 1
             self.put_obj(Door(colors[door], is_locked=True), split_idx, door_idx)
 
         for key in range(self.keys):
             if self.determ:
                 self.put_obj(Key(colors[key]), self.key_widths[key], self.key_heights[key])
-
             self.place_obj(obj=Key(colors[key]), top=(0, 0), size=(split_idx, height))
 
         self.mission = "use the key to open the same color door and then get to the goal"
 
 
-class DoorMultiKeyEnv5x5(DoorKeyEnv):
+class DoorMultiKeyEnv5x5(MultiDoorMultiKeyEnv):
     def __init__(self):
         super().__init__(size=5)
 
 
-class DoorMultiKeyEnv6x6(DoorKeyEnv):
+class DoorMultiKeyEnv6x6(MultiDoorMultiKeyEnv):
     def __init__(self):
         super().__init__(size=6)
 
 
-class DoorMultiKeyEnv16x16(DoorKeyEnv):
+class DoorMultiKeyEnv16x16(MultiDoorMultiKeyEnv):
     def __init__(self):
         super().__init__(size=16)
 
 
+
+
 register(
     id='MiniGrid-DoorMultiKey-5x5-v0',
-    entry_point='minigrid_novelty_generator.envs:DoorMultiKeyEnvEnv5x5'
+    entry_point='novgrid.envs:DoorMultiKeyEnvEnv5x5'
 )
 
 register(
     id='MiniGrid-DoorMultiKey-6x6-v0',
-    entry_point='minigrid_novelty_generator.envs:DoorMultiKeyEnv6x6'
+    entry_point='novgrid.envs:DoorMultiKeyEnv6x6'
 )
 
 register(
     id='MiniGrid-DoorMultiKey-8x8-v0',
-    entry_point='minigrid_novelty_generator.envs:DoorMultiKeyEnv'
+    entry_point='novgrid.envs:DoorMultiKeyEnv'
 )
 
 register(
     id='MiniGrid-DoorMultiKey-16x16-v0',
-    entry_point='minigrid_novelty_generator.envs:DoorMultiKeyEnv16x16'
+    entry_point='novgrid.envs:DoorMultiKeyEnv16x16'
 )

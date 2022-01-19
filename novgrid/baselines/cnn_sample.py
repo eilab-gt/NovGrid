@@ -1,5 +1,8 @@
+import imp
 import os
 from datetime import datetime
+import sys
+sys.path.append(r"/home/ei-lab/code/sailon/NovGrid")
 import gym_minigrid  # MUST BE IMPORTED TO SEE ENVIRONMENTS
 import torch as th
 import gym
@@ -16,6 +19,8 @@ from novgrid.utils.novgrid_utils import make_env
 from novgrid.utils.baseline_utils import MinigridCNN
 from novgrid.novelty_generation.novelty_wrappers import *
 
+import matplotlib.pyplot as plt
+
 device = th.device('cuda' if th.cuda.is_available() else 'cpu')
 
 
@@ -30,6 +35,7 @@ def main(args):
         wandb_config = {
             "total_timesteps": args.total_timesteps,
             "env_name": args.env,
+            "novelty_episode": args.novelty_episode
         }
         run = wandb.init(
             project="sb3_minigrid",
@@ -42,8 +48,9 @@ def main(args):
 
     # Create environments
     # env_wrappers = [DoorKeyChange]
-    env_wrappers = [DoorKeyNoveltyWrapper]
-    env_list = [make_env(args.env, log_dir, wrappers=env_wrappers) for _ in range(args.num_workers)]
+    env_wrappers = []
+    env_list = [make_env(args.env, log_dir, wrappers=env_wrappers, novelty_episode=args.novelty_episode) 
+        for _ in range(args.num_workers)]
     env = VecMonitor(DummyVecEnv(env_list), filename=log_dir)
     # env = DummyVecEnv([lambda: Monitor(CustomEnv(reward_func=FUNCTION), log_dir, allow_early_resets=True) for _ in range(num_cpu)])
 
@@ -58,9 +65,9 @@ def main(args):
                 verbose=1,
                 tensorboard_log=log_dir,
                 device=device)
-    # if args.load_model:
-    #     print(f'loading model {args.load_model}')
-    #     model.set_parameters(args.load_model)
+    if args.load_model:
+        print(f'loading model {args.load_model}')
+        model.set_parameters(args.load_model)
 
     # Set up experiment callbacks
     eval_callback = EvalCallback(
@@ -82,15 +89,20 @@ def main(args):
 
     # Run Experiments!
     # TODO: this way of having multiple runs probably will not work with wandb, it will think its all one exp
-    for exp in range(args.num_exp):
-        model.learn(
-            total_timesteps=10000000,
-            tb_log_name='run_{}'.format(exp),
-            callback=all_callback,
-        )
-        model.save(log_dir + '/' + 'run_{}'.format(exp) + '_final_model')
-    if args.wandb_track:
-        run.finish()
+
+    env = gym.make('MiniGrid-Door2Key-6x6-v0')
+    img = env.render('rbg_array')
+    print(img)
+
+    # for exp in range(args.num_exp):
+    #     model.learn(
+    #         total_timesteps=args.total_timesteps,
+    #         tb_log_name='run_{}'.format(exp),
+    #         callback=all_callback,
+    #     )
+    #     model.save(log_dir + '/' + 'run_{}'.format(exp) + '_final_model')
+    # if args.wandb_track:
+    #     run.finish()
 
 
 if __name__ == "__main__":

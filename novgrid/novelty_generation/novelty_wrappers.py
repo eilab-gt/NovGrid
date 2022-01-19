@@ -5,7 +5,7 @@ import gym
 import numpy as np
 
 from .novelty_objs import ColorDoor
-from gym_minigrid.minigrid import Key, Grid, Door, Goal, COLORS
+from gym_minigrid.minigrid import Key, Grid, Goal, COLORS
 
 
 class NoveltyWrapper(gym.core.Wrapper):
@@ -18,10 +18,10 @@ class NoveltyWrapper(gym.core.Wrapper):
     which is called by `_post_novelty_reset` after the novelty episode is reached.
     """
 
-    def __init__(self, env, novelty_episode=0):
+    def __init__(self, env, novelty_episode):
         super().__init__(env)
         self.novelty_episode = novelty_episode
-        self.novelty_injected = False
+        self.num_episodes = 0
 
     def reset(self, **kwargs):
         self.num_episodes += 1
@@ -67,9 +67,13 @@ class NoveltyWrapper(gym.core.Wrapper):
         This is the main function where you implement the novelty
         """
         raise NotImplementedError
+    
 
 
-class DoorKeyNoveltyWrapper(NoveltyWrapper):
+class DoorKeyChange(NoveltyWrapper):
+
+    def __init__(self, env, novelty_episode=10000):
+        super().__init__(env, novelty_episode)
 
     def _post_novelty_gen_grid(self, width, height):
         # Create an empty grid
@@ -106,7 +110,10 @@ class DoorKeyNoveltyWrapper(NoveltyWrapper):
         self.env.mission = "use different color key to open the door and then get to the goal"
 
 
-class Door2KeyNoveltyWrapper(NoveltyWrapper):
+class Door2KeyChange(NoveltyWrapper):
+
+    def __init__(self, env, novelty_episode=10000):
+        super().__init__(env, novelty_episode)
 
     def _post_novelty_gen_grid(self, width, height):
         # Create an empty grid
@@ -150,7 +157,10 @@ class Door2KeyNoveltyWrapper(NoveltyWrapper):
         self.env.mission = "use different color key to open the door and then get to the goal"
 
 
-class MultiDoorMultiKeyNoveltyWrapper(NoveltyWrapper):
+class MultiDoorMultiKeyChange(NoveltyWrapper):
+
+    def __init__(self, env, novelty_episode=10000):
+        super().__init__(env, novelty_episode)
 
     def _post_novelty_gen_grid(self, width, height):
         # Create an empty grid
