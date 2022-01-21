@@ -268,9 +268,9 @@ class ForwardMovementSpeed(NoveltyWrapper):
         if self.num_episodes >= self.novelty_episode:
             if action == self.env.actions.forward:
                 obs, reward, done, info = self.env.step(action, **kwargs)
-                self.env.step_count -= 1
                 if done:
                     return obs, reward, done, info
+                self.env.step_count -= 1
         return self.env.step(action, **kwargs)
 
 
@@ -306,13 +306,14 @@ class ActionRadius(NoveltyWrapper):
         obs, reward, done, info = self.env.step(action, **kwargs)
         if self.num_episodes >= self.novelty_episode:
             if action == self.env.actions.pickup and self.env.carrying is None:
-                fwd_pos = self.env.front_pos + self.env.dir_vec
-                fwd_cell = self.grid.get(*fwd_pos)
-                if fwd_cell and fwd_cell.can_pickup():
-                    self.env.carrying = fwd_cell
-                    self.env.carrying.cur_pos = np.array([-1, -1])
-                    self.grid.set(*fwd_pos, None)
-                    obs = self.env.gen_obs()
+                i, j = self.env.front_pos + self.env.dir_vec
+                if i >= 0 and i < self.env.width and j >= 0 and j < self.env.height:
+                    fwd_cell = self.grid.get(i, j)
+                    if fwd_cell and fwd_cell.can_pickup():
+                        self.env.carrying = fwd_cell
+                        self.env.carrying.cur_pos = np.array([-1, -1])
+                        self.grid.set(i, j, None)
+                        obs = self.env.gen_obs()
         return obs, reward, done, info
 
 
@@ -331,9 +332,9 @@ class Burdening(NoveltyWrapper):
                 self.env.step_count += 1
             elif action == self.env.actions.forward and not self.env.carrying:
                 obs, reward, done, info = self.env.step(action, **kwargs)
-                self.env.step_count -= 1
                 if done:
                     return obs, reward, done, info
+                self.env.step_count -= 1
         return self.env.step(action, **kwargs)
 
         
