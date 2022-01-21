@@ -1,4 +1,4 @@
-from gym_minigrid.minigrid import WorldObj, Key, Door
+from gym_minigrid.minigrid import Key, Door
 
 
 class ColorDoor(Door):
@@ -21,6 +21,34 @@ class ColorDoor(Door):
                 self.is_locked = False
                 self.is_open = True
                 return True
+            return False
+
+        self.is_open = not self.is_open
+        return True
+
+
+class MultiKeyDoor(Door):
+    """
+    A Door instance where multiple keys are required to unlock the door
+    """
+    def __init__(self, color, is_open=False, is_locked=False, key_colors=None):
+        super().__init__(color, is_open, is_locked)
+        self.is_open = is_open
+        self.is_locked = is_locked
+        if key_colors:
+            self.key_colors = key_colors
+        else:
+            self.key_colors = color
+            
+        
+    def toggle(self, env, pos):
+        if self.is_locked:
+            if isinstance(env.carrying, Key) and env.carrying.color in self.key_colors:
+                self.key_colors.remove(env.carrying.color)
+                if len(self.key_colors) == 0:
+                    self.is_locked = False
+                    self.is_open = True
+                    return True
             return False
 
         self.is_open = not self.is_open

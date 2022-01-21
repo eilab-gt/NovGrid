@@ -4,8 +4,8 @@ from datetime import datetime
 import sys
 
 sys.path.append(r"/home/ei-lab/code/sailon/NovGrid")
-from novgrid.wrappers import FlatObsWrapper
 import gym_minigrid  # MUST BE IMPORTED TO SEE ENVIRONMENTS
+from gym_minigrid.wrappers import FlatObsWrapper
 import torch as th
 import gym
 import wandb
@@ -18,7 +18,6 @@ from stable_baselines3.common.callbacks import EvalCallback, CheckpointCallback,
 
 from novgrid.utils.parser import getparser
 from novgrid.utils.novgrid_utils import make_env
-from novgrid.utils.baseline_utils import MinigridCNN
 from novgrid.novelty_generation.novelty_wrappers import *
 
 import matplotlib.pyplot as plt
@@ -50,8 +49,8 @@ def main(args):
 
     # Create environments
     # env_wrappers = [DoorKeyChange]
-    env_wrappers = [MultiDoorMultiKeyChange, FlatObsWrapper]
-    env_list = [make_env(args.env, log_dir, wrappers=env_wrappers) for _ in range(args.num_workers)]
+    env_wrappers = [ActionRadius]
+    env_list = [make_env(args.env, log_dir, env_wrappers, args.novelty_episode) for _ in range(args.num_workers)]
     env = VecMonitor(DummyVecEnv(env_list))
     # env = DummyVecEnv([lambda: Monitor(CustomEnv(reward_func=FUNCTION), log_dir, allow_early_resets=True) for _ in range(num_cpu)])
 

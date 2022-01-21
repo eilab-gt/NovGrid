@@ -1,11 +1,12 @@
-from gym_minigrid.envs.doorkey import DoorKeyEnv
-from gym_minigrid.minigrid import Key, Grid, Door, Goal, COLORS
+from gym_minigrid.envs import DoorKeyEnv
 from gym_minigrid.register import register
+from gym_minigrid.minigrid import Key, Grid, Door, Goal, COLORS
+from matplotlib.pyplot import grid
 import numpy as np
 
 
 class MultiDoorMultiKeyEnv(DoorKeyEnv):
-    def __init__(self, size=8, doors=2, keys=2, determ=False, seed=13):
+    def __init__(self, size=6, doors=1, keys=1, determ=False, seed=13, locked=None):
         if (doors > (size - 3)) or (keys > (size - 3)):
             raise ValueError("Both doors:{} and keys:{} must be less than size-3:{}".format(doors, keys, size))
         elif doors > 6 or keys > 6:
@@ -65,23 +66,17 @@ class MultiDoorMultiKeyEnv(DoorKeyEnv):
 
         self.mission = "use the key to open the same color door and then get to the goal"
 
-
-class DoorMultiKeyEnv5x5(MultiDoorMultiKeyEnv):
+class DoorMultiKeyEnv5x5(DoorKeyEnv):
     def __init__(self):
-        super().__init__(size=5)
+        super().__init__(size=5, doors=2, keys=2)
 
-
-class DoorMultiKeyEnv6x6(MultiDoorMultiKeyEnv):
+class DoorMultiKeyEnv6x6(DoorKeyEnv):
     def __init__(self):
-        super().__init__(size=6)
+        super().__init__(size=6, doors=2, keys=2)
 
-
-class DoorMultiKeyEnv16x16(MultiDoorMultiKeyEnv):
+class DoorMultiKeyEnv16x16(DoorKeyEnv):
     def __init__(self):
-        super().__init__(size=16)
-
-
-
+        super().__init__(size=16, doors=2, keys=2)
 
 register(
     id='MiniGrid-DoorMultiKey-5x5-v0',
@@ -91,11 +86,6 @@ register(
 register(
     id='MiniGrid-DoorMultiKey-6x6-v0',
     entry_point='novgrid.envs:DoorMultiKeyEnv6x6'
-)
-
-register(
-    id='MiniGrid-DoorMultiKey-8x8-v0',
-    entry_point='novgrid.envs:DoorMultiKeyEnv'
 )
 
 register(
