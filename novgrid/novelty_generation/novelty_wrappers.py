@@ -303,18 +303,17 @@ class ActionRadius(NoveltyWrapper):
         return self.env.reset(**kwargs)
 
     def step(self, action, **kwargs):
-        obs, reward, done, info = self.env.step(action, **kwargs)
         if self.num_episodes >= self.novelty_episode:
+            obs, reward, done, info = self.env.step(action, **kwargs)
             if action == self.env.actions.pickup and self.env.carrying is None:
-                i, j = self.env.front_pos + self.env.dir_vec
-                if i >= 0 and i < self.env.width and j >= 0 and j < self.env.height:
-                    fwd_cell = self.grid.get(i, j)
-                    if fwd_cell and fwd_cell.can_pickup():
-                        self.env.carrying = fwd_cell
-                        self.env.carrying.cur_pos = np.array([-1, -1])
-                        self.grid.set(i, j, None)
-                        obs = self.env.gen_obs()
-        return obs, reward, done, info
+                agent_pos = self.env.agent_pos
+                self.env.step(self.env.actions.forward, **kwargs)
+                self.env.step(action, **kwargs)
+                self.env.agent_pos = agent_pos
+                self.env.step_count -= 2
+                obs = self.env.gen_obs()
+            return obs, reward, done, info
+        return self.env.step(action, **kwargs)
 
 
 class Burdening(NoveltyWrapper):
@@ -337,7 +336,27 @@ class Burdening(NoveltyWrapper):
                 self.env.step_count -= 1
         return self.env.step(action, **kwargs)
 
-        
+
+class ColorRestriction(NoveltyWrapper):
+
+    def __init__(self, env, novelty_episode):
+        super().__init__(env, novelty_episode)
+
+    def reset(self, **kwargs):
+        self.num_episodes += 1
+        return self.env.reset(**kwargs)
+
+    def step(self, action, **kwargs):
+        if self.num_episodes >= self.novelty_episode:
+            if action == self.env.actions.pickup:
+                fwd_pos = self.env.front_pos
+                fwd_cell = self.env.grid.get(*fwd_pos)
+                if fwd_cell and fwd_cell.can_pickup() and fwd_cell.color == 'yellow':
+                    action = self.env.actions.done
+        return self.env.step(action, **kwargs)
+
+
+
 
 
     
