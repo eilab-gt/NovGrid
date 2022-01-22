@@ -342,9 +342,49 @@ class ColorRestriction(NoveltyWrapper):
     def __init__(self, env, novelty_episode):
         super().__init__(env, novelty_episode)
 
-    def reset(self, **kwargs):
-        self.num_episodes += 1
-        return self.env.reset(**kwargs)
+    def _post_novelty_gen_grid(self, width, height):
+        # Create an empty grid
+        self.env.grid = Grid(width, height)
+
+        # Generate the surrounding walls
+        self.env.grid.wall_rect(0, 0, width, height)
+
+        # Place a goal in the bottom-right corner
+        self.env.put_obj(Goal(), width - 2, height - 2)
+
+        # Create a vertical splitting wall
+        splitIdx = self._rand_int(2, width - 2)
+        self.env.grid.vert_wall(splitIdx, 0)
+
+        # Place the agent at a random position and orientation
+        # on the left side of the splitting wall
+        self.env.place_agent(size=(splitIdx, height))
+
+        # Place a door in the wall
+        doorIdx = self._rand_int(1, width - 2)
+        self.env.put_obj(Door('yellow', is_locked=True), splitIdx, doorIdx)
+
+        doorIdx = self._rand_int(1, width - 2)
+        while isinstance(self.env.grid.get(splitIdx, doorIdx), Door):
+            doorIdx = self._rand_int(1, width - 2)
+        self.env.put_obj(Door('blue', is_locked=True), splitIdx, doorIdx)
+
+        # Place a yellow key on the left side
+        self.env.place_obj(
+            obj=Key('yellow'),
+            top=(0, 0),
+            size=(splitIdx, height)
+        )
+
+        # Place a blue key on the left side
+        self.env.place_obj(
+            obj=Key('blue'),
+            top=(0, 0),
+            size=(splitIdx, height)
+        )
+
+        self.env.mission = "use blue key to open the blue door and then get to the goal"
+
 
     def step(self, action, **kwargs):
         if self.num_episodes >= self.novelty_episode:
@@ -352,7 +392,7 @@ class ColorRestriction(NoveltyWrapper):
                 fwd_pos = self.env.front_pos
                 fwd_cell = self.env.grid.get(*fwd_pos)
                 if fwd_cell and fwd_cell.can_pickup() and fwd_cell.color == 'yellow':
-                    action = self.env.actions.done
+                    return self.env.step(self.env.actions.done, **kwargs)
         return self.env.step(action, **kwargs)
 
 

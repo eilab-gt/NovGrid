@@ -26,33 +26,36 @@ device = th.device('cuda' if th.cuda.is_available() else 'cpu')
 
 
 def main(args):
-    # Set up tracking and logging
+    # Set up tracking
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
     log_dir = os.path.abspath('./logs/' + args.saves_logs + '_' + dt_string)
     wandb_root = os.path.abspath('./logs/')
     wandb_log = os.path.join(wandb_root, args.saves_logs + '_' + dt_string)
+
+    # Create environments
+    env_wrappers = [DoorKeyChange]
+    env_list = [make_env(args.env, log_dir, env_wrappers, args.novelty_episode) for _ in range(args.num_workers)]
+    env = VecMonitor(DummyVecEnv(env_list))
+    # env = DummyVecEnv([lambda: Monitor(CustomEnv(reward_func=FUNCTION), log_dir, allow_early_resets=True) for _ in range(num_cpu)])
+
+    # Set up logging
     if args.wandb_track:
         wandb_config = {
             "total_timesteps": args.total_timesteps,
             "env_name": args.env,
-            "novelty_episode": args.novelty_episode
+            "novelty_episode": args.novelty_episode,
+            "novelty_wrappers": env_wrappers[0].__name__
         }
         run = wandb.init(
-            project="sb3_minigrid",
+            project="minigrid",
             dir=wandb_root,
             config=wandb_config,
             sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
             monitor_gym=True,  # auto-upload the videos of agents playing the game
             save_code=True,  # optional
         )
-
-    # Create environments
-    # env_wrappers = [DoorKeyChange]
-    env_wrappers = [ImperviousToLava]
-    env_list = [make_env(args.env, log_dir, env_wrappers, args.novelty_episode) for _ in range(args.num_workers)]
-    env = VecMonitor(DummyVecEnv(env_list))
-    # env = DummyVecEnv([lambda: Monitor(CustomEnv(reward_func=FUNCTION), log_dir, allow_early_resets=True) for _ in range(num_cpu)])
+        wandb.run.name = env_wrappers[0].__name__
 
     # Set up and create model
     model = PPO("MlpPolicy",
