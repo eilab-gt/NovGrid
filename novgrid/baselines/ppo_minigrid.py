@@ -3,7 +3,6 @@ import os
 from datetime import datetime
 import sys
 
-sys.path.append(r"/home/ei-lab/code/sailon/NovGrid")
 import gym_minigrid  # MUST BE IMPORTED TO SEE ENVIRONMENTS
 from gym_minigrid.wrappers import FlatObsWrapper
 import torch as th
