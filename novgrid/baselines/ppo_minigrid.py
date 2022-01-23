@@ -34,7 +34,7 @@ def main(args):
     wandb_log = os.path.join(wandb_root, args.saves_logs + '_' + dt_string)
 
     # Create environments
-    env_wrappers = [DoorKeyChange]
+    env_wrappers = [GoalLocationChange]
     env_list = [make_env(args.env, log_dir, env_wrappers, args.novelty_episode) for _ in range(args.num_workers)]
     env = VecMonitor(DummyVecEnv(env_list))
     # env = DummyVecEnv([lambda: Monitor(CustomEnv(reward_func=FUNCTION), log_dir, allow_early_resets=True) for _ in range(num_cpu)])

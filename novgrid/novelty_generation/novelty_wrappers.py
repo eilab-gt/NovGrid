@@ -94,6 +94,7 @@ class DoorKeyChange(NoveltyWrapper):
 
         # Place a door in the wall
         doorIdx = self._rand_int(1, width-2)
+        # Yellow door object that will open when toggled with a blue key
         self.env.put_obj(ColorDoor('yellow', is_locked=True, key_color='blue'), splitIdx, doorIdx)
 
         # Place a yellow key on the left side
@@ -138,6 +139,7 @@ class DoorLockToggle(NoveltyWrapper):
 
         # Place a door in the wall
         doorIdx = self._rand_int(1, width - 2)
+        # Yellow door object that is already unlocked
         self.env.put_obj(Door('yellow', is_locked=False), splitIdx, doorIdx)
 
         # Place a yellow key on the left side
@@ -175,6 +177,7 @@ class DoorNumKeys(NoveltyWrapper):
 
         # Place a door in the wall
         doorIdx = self._rand_int(1, width-2)
+        # Yellow door that requires a yellow key and a blue key to be opened
         self.env.put_obj(MultiKeyDoor(
             'yellow', 
             is_locked=True, 
@@ -210,7 +213,7 @@ class GoalLocationChange(NoveltyWrapper):
         # Generate the surrounding walls
         self.env.grid.wall_rect(0, 0, width, height)
 
-        # Place a goal in the top-right corner
+        # Changes the location of the goal from the bottom-right corner to the top-right corner
         self.env.put_obj(Goal(), width - 2, 1)
 
         # Create a vertical splitting wall
@@ -245,15 +248,16 @@ class ImperviousToLava(NoveltyWrapper):
         return self.env.reset(**kwargs)
 
     def step(self, action, **kwargs):
-        fwd_pos = self.env.front_pos
-        fwd_cell = self.env.grid.get(*fwd_pos)
-        obs, reward, done, info = self.env.step(action, **kwargs)
         if self.num_episodes >= self.novelty_episode:
+            fwd_pos = self.env.front_pos
+            fwd_cell = self.env.grid.get(*fwd_pos)
+            obs, reward, done, info = self.env.step(action, **kwargs)
             if done and fwd_cell and fwd_cell.type == 'lava':
                 self.env.agent_pos = fwd_pos
                 obs = self.env.gen_obs()
-                return obs, reward, not done, info
-        return obs, reward, done, info
+            return obs, reward, done, info
+        return self.env.step(action, **kwargs)
+
 
 class ForwardMovementSpeed(NoveltyWrapper):
 
@@ -290,7 +294,7 @@ class ActionReptition(NoveltyWrapper):
                 self.prev_action = action
                 return self.env.step(self.env.actions.done)
             self.prev_action = None
-        return self.env.step(action, **kwargs) 
+        return self.env.step(action, **kwargs)
     
     
 class ActionRadius(NoveltyWrapper):
