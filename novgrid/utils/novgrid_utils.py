@@ -17,7 +17,7 @@ def make_env(env_name, log_dir, wrappers=[], novelty_episode=0):
                     env = wrapper(env, novelty_episode=novelty_episode)
                 else:
                     env = wrapper(env)
-        env = FlatObsWrapper(env)
+        # env = FlatObsWrapper(env)
         # env = Monitor(env, log_dir)
         # obs = env.reset()
         return env
