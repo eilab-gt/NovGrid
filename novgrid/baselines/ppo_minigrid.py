@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 
 import gym_minigrid  # MUST BE IMPORTED TO SEE ENVIRONMENTS
+from gym_minigrid.wrappers import FlatObsWrapper
 import torch as th
 from stable_baselines3.common.vec_env import DummyVecEnv, VecMonitor
 from stable_baselines3 import PPO
@@ -17,10 +18,11 @@ def main(args):
     # Set up tracking
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
+    os.makedirs('./logs', exist_ok=True)
     log_dir = os.path.abspath('./logs/' + args.saves_logs + '_' + dt_string)
 
     # Create environments
-    env_wrappers = [GoalLocationChange]
+    env_wrappers = [DoorKeyChange, FlatObsWrapper]
     env_list = [make_env(args.env, log_dir, env_wrappers, args.novelty_episode) for _ in range(args.num_workers)]
     env = VecMonitor(DummyVecEnv(env_list))
 

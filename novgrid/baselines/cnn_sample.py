@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 import gym_minigrid  # MUST BE IMPORTED TO SEE ENVIRONMENTS
+from gym_minigrid.wrappers import ImgObsWrapper
 import torch as th
 
 from stable_baselines3.common.vec_env import DummyVecEnv, VecMonitor
@@ -23,7 +24,7 @@ def main(args):
     log_dir = os.path.abspath('./logs/' + args.saves_logs + '_' + dt_string)
 
     # Create environments
-    env_wrappers = [DoorKeyChange]
+    env_wrappers = [DoorKeyChange, ImgObsWrapper]
     env_list = [make_env(args.env, log_dir, wrappers=env_wrappers, novelty_episode=args.novelty_episode)
                 for _ in range(args.num_workers)]
     env = VecMonitor(DummyVecEnv(env_list), filename=log_dir)
