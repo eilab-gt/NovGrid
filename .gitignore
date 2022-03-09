@@ -1,5 +1,6 @@
 novgrid/baselines/logs/*
 novgrid/baselines/
+novgrid/logs/
 *.pyc
 *__pycache__
 *egg-info
