@@ -6,10 +6,11 @@ Novelty MiniGrid (NovGrid) is an extension of [MiniGrid](https://github.com/maxi
 If you find this code useful, please reference in your paper:
 
 ```
-@article{balloch2020novgrid,
+@inproceedings{balloch2022novgrid,
   title={NovGrid: A Flexible Grid World for Evaluating Agent Response to Novelty},
   author={Balloch, Jonathan and Lin, Zhiyu and Hussain, Mustafa and Srinivas, Aarun and Peng, Xiangyu and Kim, Julia and Riedl, Mark},
-  year={2020}
+  booktitle={In Proceedings of AAAI Symposium, Designing Artificial Intelligence for Open Worlds},
+  year={2022},
 }
 ```
 
