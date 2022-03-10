@@ -45,3 +45,32 @@ env = gym_minigrid.wrappers.FlatObsWrapper(env)
 model = PPO('MlpPolicy', env)
 model.learn(config['total_timesteps'])
 ```
+
+## Manual Instructions
+
+To run the baseline agent, clone the repository and follow the instructions below.
+
+Get dependencies:
+```shell
+pip install requirements.txt
+```
+
+Move into baselines directory:
+```shell
+cd novgrid/baselines
+```
+
+Train from scratch on DoorKeyChange novelty:
+
+```shell
+python ppo_minigrid.py --novelty_wrapper=DoorKeyChange
+```
+
+Loading existing model and train on DoorKeyChange novelty:
+
+```shell
+python ppo_minigrid.py --load_model=models/ppo_minigrid_example_model.zip
+
+```
+
+
