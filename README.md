@@ -24,7 +24,7 @@ pip install -e .
 
 ## Examples using NovGrid
 
-Here is an example that trains a [Stable Baselines3](https://stable-baselines3.readthedocs.io/en/master/) implementation of PPO on a MiniGrid environment that experiences the DoorKeyChange novelty:
+Here is an example that trains a [Stable Baselines3](https://stable-baselines3.readthedocs.io/en/master/) implementation of PPO on a NovGrid environment that experiences the DoorKeyChange novelty:
 
 ```python
 import gym
