@@ -33,10 +33,6 @@ class MinigridCNN(BaseFeaturesExtractor):
                 th.as_tensor(observation_space.sample()[None]).float()).shape[1]
 
         self.linear = nn.Sequential(nn.Linear(n_flatten, features_dim), nn.ReLU())
-        # n = observation_space.shape[1]
-        # m = observation_space.shape[2]
-        # self.image_embedding_size = ((n-1)//2-2)*((m-1)//2-2)*final_dim
-        # self.linear = nn.Sequential(nn.Linear(self.image_embedding_size, features_dim), nn.ReLU())
 
     def forward(self, observations: th.Tensor) -> th.Tensor:
         return self.linear(self.cnn(observations))

@@ -33,6 +33,7 @@ shortuuid==1.0.8
 six==1.16.0
 smmap==5.0.0
 stable-baselines3==1.4.0
+tensorboard
 termcolor==1.1.0
 torch==1.10.2
 typing-extensions==4.1.1
