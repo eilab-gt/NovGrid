@@ -16,7 +16,7 @@ If you find this code useful, please reference in your paper:
 
 ## Installing the NovGrid Package
 Requirements:
-- Python 3.5+
+- Python 3.6+
 
 From the NovGrid base directory run:
 ```shell
@@ -48,6 +48,8 @@ model.learn(config['total_timesteps'])
 ## Training and Testing the Installation
 
 To run the baseline agent, clone the repository and from the NovGrid base directory follow the instructions below.
+
+Install [Pytorch] (https://pytorch.org/get-started/locally/)
 
 Get dependencies:
 ```shell
