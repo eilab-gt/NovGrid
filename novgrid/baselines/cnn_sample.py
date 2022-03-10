@@ -21,10 +21,12 @@ def main(args):
     # Set up tracking and logging
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
+    os.makedirs('./logs', exist_ok=True)
     log_dir = os.path.abspath('./logs/' + args.saves_logs + '_' + dt_string)
 
     # Create environments
-    env_wrappers = [DoorKeyChange, ImgObsWrapper]
+    novelty_wrapper = eval(args.novelty_wrapper)
+    env_wrappers = [novelty_wrapper, ImgObsWrapper]
     env_list = [make_env(args.env, log_dir, wrappers=env_wrappers, novelty_episode=args.novelty_episode)
                 for _ in range(args.num_workers)]
     env = VecMonitor(DummyVecEnv(env_list), filename=log_dir)

@@ -20,6 +20,7 @@ def getparser():
     p.add('--num_workers', type=int, default=1, help='number of learning workers, and therefore environments')
     p.add('--seed', type=int, default=13, help='seed for randomness')
     p.add('--debug', default=False, action='store_true')
+    p.add('--novelty_wrapper', default='DoorKeyChange', help='novelty to inject into environment')
     p.add('--novelty_episode', default=10000, help='episode in which novelty is injected')
     parsed_args = p.parse_args()
     print(parsed_args)

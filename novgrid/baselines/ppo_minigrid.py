@@ -22,7 +22,8 @@ def main(args):
     log_dir = os.path.abspath('./logs/' + args.saves_logs + '_' + dt_string)
 
     # Create environments
-    env_wrappers = [DoorKeyChange, FlatObsWrapper]
+    novelty_wrapper = eval(args.novelty_wrapper)
+    env_wrappers = [novelty_wrapper, FlatObsWrapper]
     env_list = [make_env(args.env, log_dir, env_wrappers, args.novelty_episode) for _ in range(args.num_workers)]
     env = VecMonitor(DummyVecEnv(env_list))
 
