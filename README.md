@@ -26,3 +26,22 @@ Novelty MiniGrid--NovGrid--is an extension of MiniGrid environment that allows f
 
 ## Using the Package
 
+The easiest way to use NovGrid is to install the package via `pip install novgrid`. Here is a usage example that trains a Stable Baselines3 implementation of PPO on a MiniGrid environment that experiences the DoorKeyChange novelty:
+
+```python
+import gym
+import gym_minigrid
+from stable_baselines3 import PPO
+import novgrid
+
+config = {
+    'total_timesteps': 10000000,
+    'novelty_episode': 10000
+}
+env = gym.make('MiniGrid-DoorKey-6x6-v0')
+env = novgrid.novelty_generation.novelty_wrappers.DoorKeyChange(env, novelty_episode=config['novelty_episode'])
+env = gym_minigrid.wrappers.FlatObsWrapper(env)
+
+model = PPO('MlpPolicy', env)
+model.learn(config['total_timesteps'])
+```
