@@ -18,8 +18,8 @@ def main(args):
     # Set up tracking
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
-    os.makedirs('./logs', exist_ok=True)
     log_dir = os.path.abspath('./logs/' + args.saves_logs + '_' + dt_string)
+    os.makedirs(log_dir)
 
     # Create environments
     novelty_wrapper = eval(args.novelty_wrapper)
