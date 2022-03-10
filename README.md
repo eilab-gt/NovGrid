@@ -49,7 +49,7 @@ model.learn(config['total_timesteps'])
 
 To run the baseline agent, clone the repository and from the NovGrid base directory follow the instructions below.
 
-Install [Pytorch] (https://pytorch.org/get-started/locally/)
+Install [Pytorch](https://pytorch.org/get-started/locally/)
 
 Get dependencies:
 ```shell
