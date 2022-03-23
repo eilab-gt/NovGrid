@@ -168,7 +168,7 @@ class DoorNumKeys(NoveltyWrapper):
         self.env.put_obj(Goal(), width - 2, height - 2)
 
         # Create a vertical splitting wall
-        splitIdx = self._rand_int(2, width - 2)
+        splitIdx = self._rand_int(3, width - 2)
         self.env.grid.vert_wall(splitIdx, 0)
 
         # Place the agent at a random position and orientation
