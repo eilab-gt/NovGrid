@@ -254,7 +254,8 @@ class ImperviousToLava(NoveltyWrapper):
             obs, reward, done, info = self.env.step(action, **kwargs)
             if done and fwd_cell and fwd_cell.type == 'lava':
                 self.env.agent_pos = fwd_pos
-                obs = self.env.gen_obs()
+                obs = self.env.gen_obs()['image']
+                done = False
             return obs, reward, done, info
         return self.env.step(action, **kwargs)
 

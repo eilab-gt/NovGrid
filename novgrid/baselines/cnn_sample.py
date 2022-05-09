@@ -8,28 +8,61 @@ from stable_baselines3.common.vec_env import DummyVecEnv, VecMonitor
 from stable_baselines3.common.vec_env.vec_transpose import VecTransposeImage
 from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import EvalCallback, CallbackList
+from stable_baselines3.common.env_util import make_vec_env
 
 from novgrid.utils.parser import getparser
 from novgrid.utils.novgrid_utils import make_env
 from novgrid.utils.baseline_utils import MinigridCNN
 from novgrid.novelty_generation.novelty_wrappers import *
-
-device = th.device('cuda' if th.cuda.is_available() else 'cpu')
+# import novgrid.envs.eightbyeights
 
 
 def main(args):
+    if hasattr(args,'device'):
+        device = th.device(args.device)
+    else:
+        device = th.device('cuda' if th.cuda.is_available() else 'cpu')
     # Set up tracking and logging
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
     log_dir = os.path.abspath('./logs/' + args.saves_logs + '_' + dt_string)
     os.makedirs(log_dir)
 
-    # Create environments
-    novelty_wrapper = eval(args.novelty_wrapper)
-    env_wrappers = [novelty_wrapper, ImgObsWrapper]
-    env_list = [make_env(args.env, log_dir, wrappers=env_wrappers, novelty_episode=args.novelty_episode)
-                for _ in range(args.num_workers)]
-    env = VecMonitor(DummyVecEnv(env_list), filename=log_dir)
+    env_wrappers = [ImgObsWrapper]
+    wrappers_args = [{}]
+
+    n_envs = 16
+
+    if args.novelty_wrapper:
+        novelty_wrapper = eval(args.novelty_wrapper)
+        env_wrappers.append(novelty_wrapper)
+        wrappers_args.append({})
+        env_list = [make_env(env_name=args.env,
+                             log_dir=log_dir,
+                             wrappers=env_wrappers,
+                             novelty_episode=args.novelty_episode) for _ in range(args.num_workers)]
+        env = VecMonitor(DummyVecEnv(env_list))
+    elif n_envs>1:
+        print('try make_vec_env')
+        # This only works with a single wrapper for some reason.
+        env = make_vec_env(args.env,
+                           n_envs=n_envs,
+                           seed=0,
+                           wrapper_class=env_wrappers[0])
+    else:
+        env_list = [make_env(env_name=args.env,
+                             wrappers=env_wrappers,
+                             novelty_episode=args.novelty_episode) for _ in range(args.num_workers)]
+        env = VecMonitor(DummyVecEnv(env_list))
+
+
+
+    ## Create environments
+    # novelty_wrapper = eval(args.novelty_wrapper)
+    # env_wrappers = [novelty_wrapper, ImgObsWrapper]
+    # env_list = [make_env(args.env, log_dir, wrappers=env_wrappers, novelty_episode=args.novelty_episode)
+    #             for _ in range(args.num_workers)]
+    # env = VecMonitor(DummyVecEnv(env_list), filename=log_dir)
 
     # Set up and create model
     policy_kwargs = dict(
