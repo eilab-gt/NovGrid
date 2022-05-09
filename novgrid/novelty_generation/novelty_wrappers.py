@@ -245,6 +245,7 @@ class ImperviousToLava(NoveltyWrapper):
 
     def reset(self, **kwargs):
         self.num_episodes += 1
+        print("Episode " +str(self.num_episodes) + " complete")
         return self.env.reset(**kwargs)
 
     def step(self, action, **kwargs):
@@ -254,7 +255,7 @@ class ImperviousToLava(NoveltyWrapper):
             obs, reward, done, info = self.env.step(action, **kwargs)
             if done and fwd_cell and fwd_cell.type == 'lava':
                 self.env.agent_pos = fwd_pos
-                obs = self.env.gen_obs()['image']
+ #               obs = self.env.gen_obs()['image']
                 done = False
             return obs, reward, done, info
         return self.env.step(action, **kwargs)
