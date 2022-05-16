@@ -7,7 +7,7 @@ import torch as th
 from stable_baselines3.common.vec_env import DummyVecEnv, VecMonitor
 from stable_baselines3.common.vec_env.vec_transpose import VecTransposeImage
 from stable_baselines3 import PPO
-from stable_baselines3.common.callbacks import EvalCallback, CallbackList
+from stable_baselines3.common.callbacks import EvalCallback, CallbackList, BaseCallback
 from stable_baselines3.common.env_util import make_vec_env
 
 from novgrid.utils.parser import getparser
@@ -16,6 +16,22 @@ from novgrid.utils.baseline_utils import MinigridCNN
 from novgrid.novelty_generation.novelty_wrappers import *
 # import novgrid.envs.eightbyeights
 
+
+class NoveltyDelayCallback(BaseCallback):
+    """
+    A custom callback that derives from ``BaseCallback``.
+
+    :param verbose: (int) Verbosity level 0: not output 1: info 2: debug
+    """
+    def __init__(self, envs=None, verbose=0):
+        super(NoveltyDelayCallback, self).__init__(verbose)
+        self.envs = envs
+
+    def _on_step(self) -> bool:
+        episode_counts = self.envs.get_attr('num_episodes')
+        min_count = min(episode_counts)
+        self.envs.set_attr('num_episodes', min_count)
+        return True
 
 def main(args):
     if hasattr(args,'device'):
@@ -87,8 +103,8 @@ def main(args):
         eval_freq=10000,
         deterministic=True,
         render=False)
-    callback_list = [eval_callback]
-
+    #novelty_delay_callback = NoveltyDelayCallback(env)
+    callback_list = [eval_callback]#,novelty_delay_callback]
     all_callback = CallbackList(callback_list)
 
     # Run Experiments!

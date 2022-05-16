@@ -22,13 +22,20 @@ class NoveltyWrapper(gym.core.Wrapper):
         super().__init__(env)
         self.novelty_episode = novelty_episode
         self.num_episodes = 0
+        self.novelty_marker= -1
 
     def reset(self, **kwargs):
         self.num_episodes += 1
+        print(self.num_episodes)
         if self.num_episodes >= self.novelty_episode:
-            return self._post_novelty_reset(**kwargs)
+            if self.novelty_marker < 0:
+                self.novelty_marker = self.step
+            print("NOVELTY INVOKED ON STEP " + str(self.novelty_marker))
+            self.env.reset(**kwargs)
+            result = self._post_novelty_reset(**kwargs)['image']
         else:
-            return self.env.reset(**kwargs)
+            result = self.env.reset(**kwargs)
+        return result    
 
     def _post_novelty_reset(self, **kwargs):
         # Current position and direction of the agent
@@ -90,7 +97,9 @@ class DoorKeyChange(NoveltyWrapper):
 
         # Place the agent at a random position and orientation
         # on the left side of the splitting wall
-        self.env.place_agent(size=(splitIdx, height))
+        self.env.unwrapped.place_agent(size=(splitIdx, height))
+        self.env.agent_dir = self.env.unwrapped.agent_dir
+        self.env.agent_pos = self.env.unwrapped.agent_pos
 
         # Place a door in the wall
         doorIdx = self._rand_int(1, width-2)
@@ -245,7 +254,6 @@ class ImperviousToLava(NoveltyWrapper):
 
     def reset(self, **kwargs):
         self.num_episodes += 1
-        print("Episode " +str(self.num_episodes) + " complete")
         return self.env.reset(**kwargs)
 
     def step(self, action, **kwargs):
