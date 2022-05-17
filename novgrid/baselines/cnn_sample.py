@@ -35,7 +35,7 @@ def main(args):
 
     if args.novelty_wrapper:
         novelty_wrapper = eval(args.novelty_wrapper)
-        env_wrappers.append(novelty_wrapper)
+        env_wrappers = [novelty_wrapper] + env_wrappers
         wrappers_args.append({})
         env_list = [make_env(env_name=args.env,
                              log_dir=log_dir,
