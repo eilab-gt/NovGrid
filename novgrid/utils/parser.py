@@ -20,6 +20,9 @@ def getparser():
     p.add('--debug', default=False, action='store_true')
     p.add('--novelty_wrapper', type=str, default='', help='novelty to inject into environment')
     p.add('--novelty_episode', type=int, default=10000, help='episode in which novelty is injected')
+    p.add('--eval_interval', type=int, default=1000, help='how many steps between evaluatations')
+    p.add('--log_interval', type=int, default=10, help='how many steps between logging')
+    
     parsed_args = p.parse_args()
     print(parsed_args)
     return parsed_args
