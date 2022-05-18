@@ -29,9 +29,8 @@ class NoveltyWrapper(gym.core.Wrapper):
         print(self.num_episodes)
         if self.num_episodes >= self.novelty_episode:
             if self.novelty_marker < 0:
-                self.novelty_marker = self.step
+                self.novelty_marker = self.step_count
             print("NOVELTY INVOKED ON STEP " + str(self.novelty_marker))
-            self.env.reset(**kwargs)
             result = self._post_novelty_reset(**kwargs)['image']
         else:
             result = self.env.reset(**kwargs)
