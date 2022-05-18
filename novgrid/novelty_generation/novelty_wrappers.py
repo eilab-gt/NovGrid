@@ -2,6 +2,7 @@
 # you should be able to specify the exact novelty AND that there should be a random novelty
 import abc
 import gym
+from gym import ObservationWrapper
 import numpy as np
 
 from .novelty_objs import ColorDoor, MultiKeyDoor
@@ -22,18 +23,27 @@ class NoveltyWrapper(gym.core.Wrapper):
         super().__init__(env)
         self.novelty_episode = novelty_episode
         self.num_episodes = 0
+        self.novelty_injected = False
 
     def reset(self, **kwargs):
         self.num_episodes += 1
         if self.num_episodes >= self.novelty_episode:
+            if self.novelty_injected is False:
+                print('###############################################')
+                print('############### Novelty Injected ##############')
+                print('###############################################')
+                self.novelty_injected = True
             return self._post_novelty_reset(**kwargs)
         else:
             return self.env.reset(**kwargs)
 
     def _post_novelty_reset(self, **kwargs):
         # Current position and direction of the agent
-        self.env.agent_pos = None
-        self.env.agent_dir = None
+        self.unwrapped.agent_pos = None
+        self.unwrapped.agent_dir = None
+
+        # Item picked up, being carried, initially nothing
+        self.env.carrying = None
 
         # Generate a new random grid at the start of each episode
         # To keep the same grid for each episode, call env.seed() with
@@ -41,25 +51,26 @@ class NoveltyWrapper(gym.core.Wrapper):
         self._post_novelty_gen_grid(self.width, self.height, **kwargs)
 
         # These fields should be defined by _gen_grid
-        assert self.env.agent_pos is not None
-        assert self.env.agent_dir is not None
+        assert self.unwrapped.agent_pos is not None
+        assert self.unwrapped.agent_dir is not None
 
         # Check that the agent doesn't overlap with an object
-        start_cell = self.env.grid.get(*self.env.agent_pos)
+        start_cell = self.unwrapped.grid.get(*self.unwrapped.agent_pos)
         assert start_cell is None or start_cell.can_overlap()
-
-        # Item picked up, being carried, initially nothing
-        self.env.carrying = None
 
         # Step count since episode start
         self.env.step_count = 0
 
         # Return first observation
         obs = self.env.gen_obs()
+
+        if isinstance(self.env, ObservationWrapper):
+            obs = self.observation(obs)
+
         return obs
 
     # @abc.abstractmethod
-    def _post_novelty_gen_grid(self, width, height):
+    def _post_novelty_gen_grid(self, width, height, **kwargs):
         """
         This is the main function where you implement the novelty
         """
@@ -74,7 +85,7 @@ class DoorKeyChange(NoveltyWrapper):
     def __init__(self, env, novelty_episode):
         super().__init__(env, novelty_episode)
 
-    def _post_novelty_gen_grid(self, width, height):
+    def _post_novelty_gen_grid(self, width, height, **kwargs):
         # Create an empty grid
         self.env.grid = Grid(width, height)
 
@@ -168,7 +179,7 @@ class DoorNumKeys(NoveltyWrapper):
         self.env.put_obj(Goal(), width - 2, height - 2)
 
         # Create a vertical splitting wall
-        splitIdx = self._rand_int(2, width - 2)
+        splitIdx = self._rand_int(3, width - 2)
         self.env.grid.vert_wall(splitIdx, 0)
 
         # Place the agent at a random position and orientation
