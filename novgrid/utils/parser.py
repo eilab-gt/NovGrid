@@ -2,10 +2,10 @@ import configargparse
 
 
 def getparser():
-    '''
+    """
     Reminder: all values have to be here to be modified by a config file.
     Precendence: command line > environment variables > config file values > defaults
-    '''
+    """
     p = configargparse.ArgParser(default_config_files=['default.ini'])
     p.add('--exp_config', required=False, is_config_file=True, help='config file path for the experiment')
     p.add('-t', '--total_timesteps', type=int, default=2500000, help='total timesteps per experiment')
@@ -20,6 +20,9 @@ def getparser():
     p.add('--debug', default=False, action='store_true')
     p.add('--novelty_wrapper', type=str, default='', help='novelty to inject into environment')
     p.add('--novelty_episode', type=int, default=10000, help='episode in which novelty is injected')
+    p.add('--eval_interval', type=int, default=1000, help='how many steps between evaluatations')
+    p.add('--log_interval', type=int, default=10, help='how many steps between logging')
+    
     parsed_args = p.parse_args()
     print(parsed_args)
     return parsed_args

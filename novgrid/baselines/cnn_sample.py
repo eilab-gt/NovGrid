@@ -14,7 +14,6 @@ from novgrid.utils.parser import getparser
 from novgrid.utils.novgrid_utils import make_env
 from novgrid.utils.baseline_utils import MinigridCNN
 from novgrid.novelty_generation.novelty_wrappers import *
-# import novgrid.envs.eightbyeights
 
 
 def main(args):
@@ -31,13 +30,14 @@ def main(args):
     env_wrappers = [ImgObsWrapper]
     wrappers_args = [{}]
 
-    n_envs = 16
+    n_envs = args.num_workers
 
     if args.novelty_wrapper:
         novelty_wrapper = eval(args.novelty_wrapper)
-        env_wrappers.append(novelty_wrapper)
+        env_wrappers = [novelty_wrapper] + env_wrappers
         wrappers_args.append({})
         env_list = [make_env(env_name=args.env,
+                             log_dir=log_dir,
                              wrappers=env_wrappers,
                              novelty_episode=args.novelty_episode) for _ in range(args.num_workers)]
         env = VecMonitor(DummyVecEnv(env_list))
@@ -53,15 +53,6 @@ def main(args):
                              wrappers=env_wrappers,
                              novelty_episode=args.novelty_episode) for _ in range(args.num_workers)]
         env = VecMonitor(DummyVecEnv(env_list))
-
-
-
-    ## Create environments
-    # novelty_wrapper = eval(args.novelty_wrapper)
-    # env_wrappers = [novelty_wrapper, ImgObsWrapper]
-    # env_list = [make_env(args.env, log_dir, wrappers=env_wrappers, novelty_episode=args.novelty_episode)
-    #             for _ in range(args.num_workers)]
-    # env = VecMonitor(DummyVecEnv(env_list), filename=log_dir)
 
     # Set up and create model
     policy_kwargs = dict(
@@ -83,7 +74,7 @@ def main(args):
         VecTransposeImage(env),
         best_model_save_path=log_dir,
         log_path=log_dir,
-        eval_freq=10000,
+        eval_freq=args.eval_interval,
         deterministic=True,
         render=False)
     callback_list = [eval_callback]
@@ -94,6 +85,7 @@ def main(args):
     for exp in range(args.num_exp):
         model.learn(
             total_timesteps=args.total_timesteps,
+            log_interval=args.log_interval,
             tb_log_name='run_{}'.format(exp),
             callback=all_callback,
         )
