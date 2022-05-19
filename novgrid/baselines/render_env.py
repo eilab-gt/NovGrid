@@ -8,7 +8,7 @@ from PIL import Image
 from gym_minigrid.wrappers import *
 
 
-env_name = 'MiniGrid-LavaShortcutMaze7x7-v0'
+env_name = 'MiniGrid-LavaShortcutMaze8x8-v0'
 # env = RGBImgPartialObsWrapper(env)
 # env = ImgObsWrapper(env)
 

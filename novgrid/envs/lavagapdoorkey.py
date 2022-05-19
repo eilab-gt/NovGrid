@@ -125,9 +125,6 @@ class LavaShortcutMaze(MiniGridEnv):
         # Generate the surrounding walls
         self.grid.wall_rect(0, 0, width, height)
 
-        # Place a goal in the bottom-right corner
-        self.put_obj(Goal(), width - 2, height - 2)
-
         # first vertical walls
         first_wall_width = 2
         splitIdx = width//2
@@ -137,15 +134,24 @@ class LavaShortcutMaze(MiniGridEnv):
             for extra_wall_pos in range(1,(width-5)//2+1):
                 if extra_wall_pos % 2 == 0:
                     self.grid.vert_wall(first_wall_width+extra_wall_pos*2, 2, height - 3)
+                    # Place a goal in the bottom-right corner
+                    # self.put_obj(Goal(), width - 2, height - 2)
                 else:
                     self.grid.vert_wall(first_wall_width+extra_wall_pos*2, 0, height - 3)
+                    # Place a goal in the top-right corner
+                    # self.put_obj(Goal(), width - 2, 1)
+        else:
+            pass
+        # Place a goal in the bottom-right corner
+        self.put_obj(Goal(), width - 2, height - 2)
 
         # Create a horizontal lava
         self.grid.horz_wall(2, height-2, width-4, Lava)
 
-        # Place the agent at a random position and orientation
-        # on the left side of the splitting wall
-        self.place_agent(size=(first_wall_width, height))
+        # Place the agent at a fixed bottom left position
+        # and random orientation
+        self.place_agent(top=(0, height-2),
+                         size=(first_wall_width, height))
 
         self.mission = "Avoid the lava and use the key to open the door and then get to the goal"
 
@@ -194,6 +200,11 @@ class LavaShortcutMaze7x7(LavaShortcutMaze):
         super().__init__(size=7)
 
 
+class LavaShortcutMaze8x8(LavaShortcutMaze):
+    def __init__(self):
+        super().__init__(size=8)
+
+
 class LavaShortcutMaze9x9(LavaShortcutMaze):
     def __init__(self):
         super().__init__(size=9)
@@ -231,6 +242,11 @@ register(
 register(
     id='MiniGrid-LavaShortcutMaze7x7-v0',
     entry_point='novgrid.envs:LavaShortcutMaze7x7'
+)
+
+register(
+    id='MiniGrid-LavaShortcutMaze8x8-v0',
+    entry_point='novgrid.envs:LavaShortcutMaze8x8'
 )
 
 register(

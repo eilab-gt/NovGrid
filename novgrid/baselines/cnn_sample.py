@@ -3,6 +3,8 @@ from datetime import datetime
 import gym_minigrid  # MUST BE IMPORTED TO SEE ENVIRONMENTS
 from gym_minigrid.wrappers import ImgObsWrapper
 import torch as th
+import wandb
+from wandb.integration.sb3 import WandbCallback
 
 from stable_baselines3.common.vec_env import DummyVecEnv, VecMonitor
 from stable_baselines3.common.vec_env.vec_transpose import VecTransposeImage
@@ -23,9 +25,42 @@ def main(args):
         device = th.device('cuda' if th.cuda.is_available() else 'cpu')
     # Set up tracking and logging
     now = datetime.now()
-    dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
-    log_dir = os.path.abspath('./logs/' + args.saves_logs + '_' + dt_string)
+    dt_string = now.strftime("%Y-%m-%d_%H-%M-%S")
+    if args.saves_logs == 'logs':
+        defaults = getparser([])
+        if defaults != args:
+            logstr = ''
+            for key, value in args.__dict__.items():
+                if defaults.__dict__[key] != value:
+                    elemstr = str(key) + '=' + str(value) + '_'
+                    logstr += elemstr
+    else:
+        logstr = args.saves_logs
+
+
+    log_dir = os.path.abspath('./logs/' + logstr + '_' + dt_string)
     os.makedirs(log_dir)
+
+    if args.wandb_track:
+        wandb_config = {
+            'total_timesteps': args.total_timesteps,
+            'env_name': args.env,
+            'novelty_wrapper': args.novelty_wrapper,
+            'novelty_episode': args.novelty_episode,
+            'args': args
+        }
+        wandb.tensorboard.patch(root_logdir=log_dir, pytorch=True)
+        wandb_run = wandb.init(
+            project='novgrid_baselines',
+            entity="balloch",
+            settings=wandb.Settings(start_method="fork"),
+            name=logstr + '_' + dt_string,
+            dir='./logs/',
+            config=wandb_config,
+            sync_tensorboard=True,
+            monitor_gym=True
+        )
+
 
     env_wrappers = [ImgObsWrapper]
     wrappers_args = [{}]
@@ -78,6 +113,15 @@ def main(args):
         deterministic=True,
         render=False)
     callback_list = [eval_callback]
+
+    if args.wandb_track:
+        tracking_callback = WandbCallback(
+            gradient_save_freq=10,
+            model_save_path=wandb_run.dir, #'/datadrive/wandb_tmp/',
+            model_save_freq=10000,
+            verbose=2)
+        callback_list.append(tracking_callback)
+        # wandb.watch(sb_policy)
 
     all_callback = CallbackList(callback_list)
 
