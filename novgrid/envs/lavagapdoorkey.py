@@ -161,7 +161,7 @@ class LavaShortcutMaze(MiniGridEnv):
         if self.simple_reward:
             return 1
         else:
-            return (1 - 0.9 * (self.step_count / self.max_steps)) * 10
+            return (1 - 0.9 * (self.step_count / self.max_steps))  # * 10
 
 
 class LavaGapDoorKeyEnv5x5(LavaGapDoorKeyEnv):

@@ -22,16 +22,30 @@ class NoveltyWrapper(gym.core.Wrapper):
         super().__init__(env)
         self.novelty_episode = novelty_episode
         self.num_episodes = 0
+        self.num_steps = 0
+        self.novelty_step = -1
 
     def reset(self, **kwargs):
-        self.num_episodes += 1
+        # don't count resets that have no steps
+        if self.unwrapped.step_count:
+            self.num_episodes += 1
+            self.num_steps += self.unwrapped.step_count
+        # if episode matches, inject novelty and record step size
         if self.num_episodes >= self.novelty_episode:
+            if self.novelty_step == -1:
+                print('############################')
+                print('##### Novelty Injected #####')
+                print(f'##### Step {self.num_steps} #####')
+                print('############################')
+                self.novelty_step = self.num_steps
+            # self.env.reset(**kwargs)
             return self._post_novelty_reset(**kwargs)
         else:
             return self.env.reset(**kwargs)
 
     def _post_novelty_reset(self, **kwargs):
         # Current position and direction of the agent
+        #todo all this should be unwrapped
         self.env.agent_pos = None
         self.env.agent_dir = None
 
@@ -63,7 +77,8 @@ class NoveltyWrapper(gym.core.Wrapper):
         """
         This is the main function where you implement the novelty
         """
-        raise NotImplementedError
+        return self.unwrapped._gen_grid(width, height)
+        # raise NotImplementedError
 
     def _rand_int(self, low, high):
         return self.env.np_random.randint(low, high)
@@ -243,9 +258,9 @@ class ImperviousToLava(NoveltyWrapper):
     def __init__(self, env, novelty_episode):
         super().__init__(env, novelty_episode)
 
-    def reset(self, **kwargs):
-        self.num_episodes += 1
-        return self.env.reset(**kwargs)
+    # def reset(self, **kwargs):
+    #     self.num_episodes += 1
+    #     return self.env.reset(**kwargs)
 
     def step(self, action, **kwargs):
         if self.num_episodes >= self.novelty_episode:
@@ -265,9 +280,9 @@ class ForwardMovementSpeed(NoveltyWrapper):
     def __init__(self, env, novelty_episode):
         super().__init__(env, novelty_episode)
 
-    def reset(self, **kwargs):
-        self.num_episodes += 1
-        return self.env.reset(**kwargs)
+    # def reset(self, **kwargs):
+    #     self.num_episodes += 1
+    #     return self.env.reset(**kwargs)
 
     def step(self, action, **kwargs):
         if self.num_episodes >= self.novelty_episode:
@@ -285,9 +300,9 @@ class ActionReptition(NoveltyWrapper):
         super().__init__(env, novelty_episode)
         self.prev_action = None
 
-    def reset(self, **kwargs):
-        self.num_episodes += 1
-        return self.env.reset(**kwargs)
+    # def reset(self, **kwargs):
+    #     self.num_episodes += 1
+    #     return self.env.reset(**kwargs)
 
     def step(self, action, **kwargs):
         if self.num_episodes >= self.novelty_episode:
@@ -303,9 +318,9 @@ class ActionRadius(NoveltyWrapper):
     def __init__(self, env, novelty_episode):
         super().__init__(env, novelty_episode)
 
-    def reset(self, **kwargs):
-        self.num_episodes += 1
-        return self.env.reset(**kwargs)
+    # def reset(self, **kwargs):
+    #     self.num_episodes += 1
+    #     return self.env.reset(**kwargs)
 
     def step(self, action, **kwargs):
         if self.num_episodes >= self.novelty_episode:
@@ -326,9 +341,8 @@ class Burdening(NoveltyWrapper):
     def __init__(self, env, novelty_episode):
         super().__init__(env, novelty_episode)
 
-    def reset(self, **kwargs):
-        self.num_episodes += 1
-        return self.env.reset(**kwargs)
+    # def reset(self, **kwargs):
+    #     return self.env.reset(**kwargs)
 
     def step(self, action, **kwargs):
         if self.num_episodes >= self.novelty_episode:

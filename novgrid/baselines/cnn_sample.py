@@ -38,10 +38,10 @@ def main(args):
         wrappers_args.append({})
         env_list = [make_env(env_name=args.env,
                              wrappers=env_wrappers,
-                             wrappers_args=wrappers_args,
-                             novelty_episode=args.novelty_episode) for _ in range(args.num_workers)]
+                             wrapper_args=wrappers_args,
+                             novelty_episode=args.novelty_episode) for _ in range(n_envs)]
         env = VecMonitor(DummyVecEnv(env_list))
-    elif n_envs>1:
+    elif n_envs > 1:
         print('try make_vec_env')
         # This only works with a single wrapper for some reason.
         env = make_vec_env(args.env,
