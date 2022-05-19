@@ -37,8 +37,8 @@ def main(args):
         env_wrappers = [novelty_wrapper] + env_wrappers
         wrappers_args.append({})
         env_list = [make_env(env_name=args.env,
-                             log_dir=log_dir,
                              wrappers=env_wrappers,
+                             wrappers_args=wrappers_args,
                              novelty_episode=args.novelty_episode) for _ in range(args.num_workers)]
         env = VecMonitor(DummyVecEnv(env_list))
     elif n_envs>1:

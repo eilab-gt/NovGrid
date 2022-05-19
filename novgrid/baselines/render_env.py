@@ -1,46 +1,42 @@
 #!/usr/bin/env python3
 
 import time
+import novgrid
 import gym_minigrid
 import gym
+from PIL import Image
 from gym_minigrid.wrappers import *
 
-env_name='Minigrid-LavaGapDoorKeyEnv5x5-v0'
 
-num_resets=200
-num_frames=5000
+env_name = 'MiniGrid-LavaShortcutMaze7x7-v0'
+# env = RGBImgPartialObsWrapper(env)
+# env = ImgObsWrapper(env)
+
 
 env = gym.make(env_name)
+env.reset()
 
-# Benchmark env.reset
-t0 = time.time()
-for i in range(num_resets):
-    env.reset()
-t1 = time.time()
-dt = t1 - t0
-reset_time = (1000 * dt) / num_resets
+# Simple rendering
+img = Image.fromarray(env.render('rgb_array'),'RGB')
+img.show()
 
-# Benchmark rendering
-t0 = time.time()
-for i in range(num_frames):
-    env.render('rgb_array')
-t1 = time.time()
-dt = t1 - t0
-frames_per_sec = num_frames / dt
-
-# Create an environment with an RGB agent observation
-env = gym.make(env_name)
-env = RGBImgPartialObsWrapper(env)
-env = ImgObsWrapper(env)
-
-# Benchmark rendering
-t0 = time.time()
-for i in range(num_frames):
-    obs, reward, done, info = env.step(0)
-t1 = time.time()
-dt = t1 - t0
-agent_view_fps = num_frames / dt
-
-print('Env reset time: {:.1f} ms'.format(reset_time))
-print('Rendering FPS : {:.0f}'.format(frames_per_sec))
-print('Agent view FPS: {:.0f}'.format(agent_view_fps))
+# ## Video rendering with timing
+# t0 = time.time()
+# num_frames=5000
+# images = []
+# for i in range(num_frames):
+#     img = Image.fromarray(env.render('rgb_array'),'RGB')
+#     images.append(img)
+#     # img.show()
+#     obs, reward, done, info = env.step(0)
+# images[0].save(env_name+'out.gif',
+#                save_all=True,
+#                append_images=images[1:],
+#                optimize=False,
+#                duration=40,
+#                loop=0)
+# t1 = time.time()
+# dt = t1 - t0
+# frames_per_sec = num_frames / dt
+#
+# print('Rendering FPS : {:.0f}'.format(frames_per_sec))
