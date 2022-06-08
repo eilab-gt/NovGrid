@@ -1,3 +1,4 @@
+logs
 novgrid/baselines/logs/*
 novgrid/baselines/logs
 *.pyc
