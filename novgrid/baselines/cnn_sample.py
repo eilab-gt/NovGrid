@@ -109,7 +109,7 @@ def main(args):
         VecTransposeImage(env),
         best_model_save_path=log_dir,
         log_path=log_dir,
-        eval_freq=args.eval_interval,
+        eval_freq=round(args.eval_interval/n_envs),
         deterministic=True,
         render=False)
     callback_list = [eval_callback]
