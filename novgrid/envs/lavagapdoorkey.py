@@ -91,7 +91,7 @@ class LavaGapDoorKeyEnv(MiniGridEnv):
         """
         agent_pos = self.agent_pos
         object = self.grid.get(agent_pos[0], agent_pos[1])
-        if object.type == "lava":
+        if (object.type == 'lava') and ():
             return -1 # Add Negative reward for stepping on Lava.
 
         if self.simple_reward:
@@ -168,6 +168,35 @@ class LavaShortcutMaze(MiniGridEnv):
             return 1
         else:
             return (1 - 0.9 * (self.step_count / self.max_steps))  # * 10
+
+class LavaSafeMaze8x8(LavaShortcutMaze):
+    def __init__(self):
+        super().__init__(size=8)
+
+    def _reward(self):
+        """
+        Compute the reward to be given upon success
+        """
+        # agent_pos = self.agent_pos
+        # object = self.grid.get(agent_pos[0], agent_pos[1])
+        # if object.type == "lava":
+        #     return -1 # NO Negative reward for stepping on Lava.
+
+        if self.simple_reward:
+            return 1
+        else:
+            return (1 - 0.9 * (self.step_count / self.max_steps))  # * 10
+
+    def step(self, action, **kwargs):
+        fwd_pos = self.front_pos
+        fwd_cell = self.grid.get(*fwd_pos)
+        obs, reward, done, info = super().step(action)
+        if done and fwd_cell and fwd_cell.type == 'lava':
+            self.agent_pos = fwd_pos
+            obs = self.gen_obs()['image']
+            done = False
+        return obs, reward, done, info
+
 
 
 class LavaGapDoorKeyEnv5x5(LavaGapDoorKeyEnv):
@@ -254,3 +283,7 @@ register(
     entry_point='novgrid.envs:LavaShortcutMaze9x9'
 )
 
+register(
+    id='MiniGrid-LavaSafeMaze8x8-v0',
+    entry_point='novgrid.envs:LavaSafeMaze8x8'
+)

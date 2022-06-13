@@ -15,6 +15,10 @@ env_name = 'MiniGrid-LavaShortcutMaze8x8-v0'
 
 env = gym.make(env_name)
 env.reset()
+outs = env.step(1)
+outs2 = env.step(1)
+outs3 = env.step(2)
+
 
 # Simple rendering
 img = Image.fromarray(env.render('rgb_array'),'RGB')
