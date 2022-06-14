@@ -193,7 +193,7 @@ class LavaSafeMaze8x8(LavaShortcutMaze):
         obs, reward, done, info = super().step(action)
         if done and fwd_cell and fwd_cell.type == 'lava':
             self.agent_pos = fwd_pos
-            obs = self.gen_obs()['image']
+            obs = self.gen_obs()
             done = False
         return obs, reward, done, info
 
