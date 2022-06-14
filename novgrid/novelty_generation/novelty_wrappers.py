@@ -18,12 +18,20 @@ class NoveltyWrapper(gym.core.Wrapper):
     which is called by `_post_novelty_reset` after the novelty episode is reached.
     """
 
-    def __init__(self, env, novelty_episode):
+    def __init__(self, env, novelty_episode=-1, novelty_step=-1):
         super().__init__(env)
+        ## ensure that one and only one of novelty_step or novelty_episode is used
+        assert novelty_episode > 0 or novelty_step > 0
+        assert not (novelty_episode > 0 and novelty_step > 0)
         self.novelty_episode = novelty_episode
+        self.novelty_step = novelty_step
+        if novelty_step != -1:
+            self.novelty_flag = 'step'
+        else:
+            self.novelty_flag = 'episode'
         self.num_episodes = 0
         self.num_steps = 0
-        self.novelty_step = -1
+        self.post_novelty = False
 
     def reset(self, **kwargs):
         # don't count resets that have no steps
@@ -32,12 +40,13 @@ class NoveltyWrapper(gym.core.Wrapper):
             self.num_steps += self.unwrapped.step_count
         # if episode matches, inject novelty and record step size
         if self.num_episodes >= self.novelty_episode:
-            if self.novelty_step == -1:
+            if self.post_novelty is False:
                 print('############################')
                 print('##### Novelty Injected #####')
                 print(f'##### Step {self.num_steps} #####')
                 print('############################')
                 self.novelty_step = self.num_steps
+                self.post_novelty = True
             # self.env.reset(**kwargs)
             return self._post_novelty_reset(**kwargs)
         else:
@@ -263,7 +272,7 @@ class ImperviousToLava(NoveltyWrapper):
     #     return self.env.reset(**kwargs)
 
     def step(self, action, **kwargs):
-        if self.num_episodes >= self.novelty_episode:
+        if self.post_novelty:
             fwd_pos = self.env.front_pos
             fwd_cell = self.env.grid.get(*fwd_pos)
             obs, reward, done, info = self.env.step(action, **kwargs)
@@ -271,6 +280,30 @@ class ImperviousToLava(NoveltyWrapper):
                 self.env.agent_pos = fwd_pos
                 obs = self.env.gen_obs()['image']
                 done = False
+            return obs, reward, done, info
+        return self.env.step(action, **kwargs)
+
+
+class LavaHurts(NoveltyWrapper):
+    """
+    for an environment where lava doesn't hurt already
+    """
+    def __init__(self, env, novelty_episode):
+        super().__init__(env, novelty_episode)
+
+    # def reset(self, **kwargs):
+    #     self.num_episodes += 1
+    #     return self.env.reset(**kwargs)
+
+    def step(self, action, **kwargs):
+        if self.post_novelty:
+            fwd_pos = self.env.front_pos
+            fwd_cell = self.env.grid.get(*fwd_pos)
+            obs, reward, done, info = self.env.step(action, **kwargs)
+            if fwd_cell and fwd_cell.type == 'lava':
+                self.env.agent_pos = fwd_pos
+                obs = self.env.gen_obs()['image']
+                done = True
             return obs, reward, done, info
         return self.env.step(action, **kwargs)
 
@@ -285,7 +318,7 @@ class ForwardMovementSpeed(NoveltyWrapper):
     #     return self.env.reset(**kwargs)
 
     def step(self, action, **kwargs):
-        if self.num_episodes >= self.novelty_episode:
+        if self.post_novelty:
             if action == self.env.actions.forward:
                 obs, reward, done, info = self.env.step(action, **kwargs)
                 if done:
@@ -305,7 +338,7 @@ class ActionReptition(NoveltyWrapper):
     #     return self.env.reset(**kwargs)
 
     def step(self, action, **kwargs):
-        if self.num_episodes >= self.novelty_episode:
+        if self.post_novelty:
             if action != self.prev_action:
                 self.prev_action = action
                 return self.env.step(self.env.actions.done)
@@ -323,7 +356,7 @@ class ActionRadius(NoveltyWrapper):
     #     return self.env.reset(**kwargs)
 
     def step(self, action, **kwargs):
-        if self.num_episodes >= self.novelty_episode:
+        if self.post_novelty:
             obs, reward, done, info = self.env.step(action, **kwargs)
             if action == self.env.actions.pickup and self.env.carrying is None:
                 agent_pos = self.env.agent_pos
@@ -345,7 +378,7 @@ class Burdening(NoveltyWrapper):
     #     return self.env.reset(**kwargs)
 
     def step(self, action, **kwargs):
-        if self.num_episodes >= self.novelty_episode:
+        if self.post_novelty:
             if action == self.env.actions.forward and self.env.carrying:
                 self.env.step_count += 1
             elif action == self.env.actions.forward and not self.env.carrying:
@@ -406,7 +439,7 @@ class ColorRestriction(NoveltyWrapper):
 
 
     def step(self, action, **kwargs):
-        if self.num_episodes >= self.novelty_episode:
+        if self.post_novelty:
             if action == self.env.actions.pickup:
                 fwd_pos = self.env.front_pos
                 fwd_cell = self.env.grid.get(*fwd_pos)
