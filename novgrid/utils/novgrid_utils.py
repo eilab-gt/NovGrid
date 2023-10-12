@@ -1,4 +1,4 @@
-import gym
+import gymnasium as gym
 
 from novgrid.novelty_generation.novelty_wrappers import NoveltyWrapper
 

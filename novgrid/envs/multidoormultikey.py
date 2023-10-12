@@ -1,6 +1,8 @@
-from gym_minigrid.envs import DoorKeyEnv
-from gym_minigrid.register import register
-from gym_minigrid.minigrid import Key, Grid, Door, Goal, COLORS
+from minigrid.envs import DoorKeyEnv
+from gymnasium.envs.registration import register
+from minigrid.core.world_object import Key, Door, Goal
+from minigrid.core.grid import Grid
+from minigrid.core.constants import COLORS
 from matplotlib.pyplot import grid
 import numpy as np
 

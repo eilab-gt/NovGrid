@@ -1,11 +1,12 @@
 # change the self.mission
 # you should be able to specify the exact novelty AND that there should be a random novelty
 import abc
-import gym
+import gymnasium as gym
 import numpy as np
 
 from .novelty_objs import ColorDoor, MultiKeyDoor
-from gym_minigrid.minigrid import Key, Grid, Door, Goal
+from minigrid.core.world_object import Key, Door, Goal
+from minigrid.core.grid import Grid
 
 
 class NoveltyWrapper(gym.core.Wrapper):

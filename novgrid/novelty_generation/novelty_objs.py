@@ -1,4 +1,4 @@
-from gym_minigrid.minigrid import Key, Door
+from minigrid.core.world_object import Key, Door
 
 
 class ColorDoor(Door):

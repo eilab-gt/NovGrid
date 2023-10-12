@@ -1,5 +1,8 @@
-from gym_minigrid.minigrid import *
-from gym_minigrid.register import register
+# from minigrid.minigrid import *
+from gymnasium.envs.registration import register
+from minigrid.minigrid_env import MiniGridEnv
+from minigrid.core.grid import Grid
+from minigrid.core.world_object import Key, Door, Goal, Lava
 import numpy as np
 
 MAXIMUM_SIZE_F = 10 # Gap needs only 4, when door key involved make it 10.

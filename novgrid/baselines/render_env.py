@@ -2,10 +2,10 @@
 
 import time
 import novgrid
-import gym_minigrid
-import gym
+import minigrid
+import gymnasium as gym
 from PIL import Image
-from gym_minigrid.wrappers import *
+from minigrid.wrappers import *
 
 
 env_name = 'MiniGrid-LavaShortcutMaze8x8-v0'

@@ -1,8 +1,10 @@
 import os
 from datetime import datetime
 
-import gym_minigrid  # MUST BE IMPORTED TO SEE ENVIRONMENTS
-from gym_minigrid.wrappers import FlatObsWrapper
+# import minigrid  # MUST BE IMPORTED TO SEE ENVIRONMENTS
+import minigrid
+from minigrid.wrappers import *
+# from minigrid.wrappers import FlatObsWrapper
 import torch as th
 from stable_baselines3.common.vec_env import DummyVecEnv, VecMonitor
 from stable_baselines3 import PPO
@@ -21,9 +23,12 @@ def main(args):
     log_dir = os.path.abspath('./logs/' + args.saves_logs + '_' + dt_string)
     os.makedirs(log_dir)
 
+
     # Create environments
-    novelty_wrapper = eval(args.novelty_wrapper)
-    env_wrappers = [novelty_wrapper, FlatObsWrapper]
+    env_wrappers = [FlatObsWrapper]
+    if args.novelty_wrapper:
+        novelty_wrapper = eval(args.novelty_wrapper)
+        env_wrappers.insert(0,novelty_wrapper)
     env_list = [make_env(args.env, log_dir, env_wrappers, args.novelty_episode) for _ in range(args.num_workers)]
     env = VecMonitor(DummyVecEnv(env_list))
 

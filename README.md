@@ -28,8 +28,8 @@ pip install -e .
 Here is an example that trains a [Stable Baselines3](https://stable-baselines3.readthedocs.io/en/master/) implementation of PPO on a NovGrid environment that experiences the DoorKeyChange novelty:
 
 ```python
-import gym
-import gym_minigrid
+import gymnasium as gym
+import minigrid
 from stable_baselines3 import PPO
 import novgrid
 
@@ -39,7 +39,7 @@ config = {
 }
 env = gym.make('MiniGrid-DoorKey-6x6-v0')
 env = novgrid.novelty_generation.novelty_wrappers.DoorKeyChange(env, novelty_episode=config['novelty_episode'])
-env = gym_minigrid.wrappers.FlatObsWrapper(env)
+env = minigrid.wrappers.FlatObsWrapper(env)
 
 model = PPO('MlpPolicy', env)
 model.learn(config['total_timesteps'])

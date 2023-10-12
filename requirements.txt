@@ -1,9 +1,10 @@
 configargparse
-gym
-gym-minigrid
 numpy
 pandas
 pathtools
 pillow
 stable_baselines3
 tensorboard
+wandb
+gymnasium
+minigrid

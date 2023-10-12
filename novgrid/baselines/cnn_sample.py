@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
-import gym_minigrid  # MUST BE IMPORTED TO SEE ENVIRONMENTS
-from gym_minigrid.wrappers import ImgObsWrapper
+import minigrid  # MUST BE IMPORTED TO SEE ENVIRONMENTS
+from minigrid.wrappers import ImgObsWrapper
 import torch as th
 import wandb
 from wandb.integration.sb3 import WandbCallback
