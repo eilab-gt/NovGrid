@@ -36,11 +36,11 @@ class NoveltyWrapper(gym.core.Wrapper):
 
     def reset(self, **kwargs):
         # don't count resets that have no steps
-        if self.unwrapped.step_count:
-            self.num_episodes += 1
+        self.num_episodes += 1
+        if self.novelty_flag == 'step' and self.unwrapped.step_count:
             self.num_steps += self.unwrapped.step_count
         # if episode matches, inject novelty and record step size
-        if self.num_episodes >= self.novelty_episode:
+        elif self.num_episodes >= self.novelty_episode:
             if self.post_novelty is False:
                 print('############################')
                 print('##### Novelty Injected #####')
@@ -56,8 +56,8 @@ class NoveltyWrapper(gym.core.Wrapper):
     def _post_novelty_reset(self, **kwargs):
         # Current position and direction of the agent
         #todo all this should be unwrapped
-        self.env.agent_pos = None
-        self.env.agent_dir = None
+        self.unwrapped.agent_pos = None
+        self.unwrapped.agent_dir = None
 
         # Generate a new random grid at the start of each episode
         # To keep the same grid for each episode, call env.seed() with
@@ -65,25 +65,26 @@ class NoveltyWrapper(gym.core.Wrapper):
         self._post_novelty_gen_grid(self.width, self.height, **kwargs)
 
         # These fields should be defined by _gen_grid
-        assert self.env.agent_pos is not None
-        assert self.env.agent_dir is not None
+        assert self.unwrapped.agent_pos is not None
+        assert self.unwrapped.agent_dir is not None
 
         # Check that the agent doesn't overlap with an object
         start_cell = self.env.grid.get(*self.env.agent_pos)
         assert start_cell is None or start_cell.can_overlap()
 
         # Item picked up, being carried, initially nothing
-        self.env.carrying = None
+        self.unwrapped.carrying = None
 
         # Step count since episode start
-        self.env.step_count = 0
+        self.unwrapped.step_count = 0
 
         # Return first observation
-        obs = self.env.gen_obs()
-        return obs
+        obs = self.unwrapped.gen_obs()
+        info = {}
+        return obs, info
 
     # @abc.abstractmethod
-    def _post_novelty_gen_grid(self, width, height):
+    def _post_novelty_gen_grid(self, width, height, seed, options):
         """
         This is the main function where you implement the novelty
         """
@@ -91,7 +92,7 @@ class NoveltyWrapper(gym.core.Wrapper):
         # raise NotImplementedError
 
     def _rand_int(self, low, high):
-        return self.env.np_random.randint(low, high)
+        return self.env.np_random.integers(low, high)
 
 
 class DoorKeyChange(NoveltyWrapper):
@@ -99,7 +100,8 @@ class DoorKeyChange(NoveltyWrapper):
     def __init__(self, env, novelty_episode):
         super().__init__(env, novelty_episode)
 
-    def _post_novelty_gen_grid(self, width, height):
+    def _post_novelty_gen_grid(self, width, height, seed, options):
+
         # Create an empty grid
         self.env.grid = Grid(width, height)
 
@@ -116,7 +118,7 @@ class DoorKeyChange(NoveltyWrapper):
         # Place the agent at a random position and orientation
         # on the left side of the splitting wall
         self.env.place_agent(size=(splitIdx, height))
-
+        
         # Place a door in the wall
         doorIdx = self._rand_int(1, width-2)
         # Yellow door object that will open when toggled with a blue key
@@ -144,7 +146,7 @@ class DoorLockToggle(NoveltyWrapper):
     def __init__(self, env, novelty_episode):
         super().__init__(env, novelty_episode)
 
-    def _post_novelty_gen_grid(self, width, height):
+    def _post_novelty_gen_grid(self, width, height, seed, options):
         # Create an empty grid
         self.env.grid = Grid(width, height)
 
@@ -182,7 +184,7 @@ class DoorNumKeys(NoveltyWrapper):
     def __init__(self, env, novelty_episode):
         super().__init__(env, novelty_episode)
 
-    def _post_novelty_gen_grid(self, width, height):
+    def _post_novelty_gen_grid(self, width, height, seed, options):
         # Create an empty grid
         self.env.grid = Grid(width, height)
 
@@ -231,7 +233,7 @@ class GoalLocationChange(NoveltyWrapper):
     def __init__(self, env, novelty_episode):
         super().__init__(env, novelty_episode)
 
-    def _post_novelty_gen_grid(self, width, height):
+    def _post_novelty_gen_grid(self, width, height, seed, options):
         # Create an empty grid
         self.env.grid = Grid(width, height)
 
@@ -395,7 +397,7 @@ class ColorRestriction(NoveltyWrapper):
     def __init__(self, env, novelty_episode):
         super().__init__(env, novelty_episode)
 
-    def _post_novelty_gen_grid(self, width, height):
+    def _post_novelty_gen_grid(self, width, height, seed, options):
         # Create an empty grid
         self.env.grid = Grid(width, height)
 

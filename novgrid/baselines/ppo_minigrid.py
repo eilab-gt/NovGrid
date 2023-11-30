@@ -25,11 +25,17 @@ def main(args):
 
 
     # Create environments
+    n_envs = args.num_workers
+
     env_wrappers = [FlatObsWrapper]
+    wrappers_args = [{}]
     if args.novelty_wrapper:
         novelty_wrapper = eval(args.novelty_wrapper)
         env_wrappers.insert(0,novelty_wrapper)
-    env_list = [make_env(args.env, log_dir, env_wrappers, args.novelty_episode) for _ in range(args.num_workers)]
+        wrappers_args.insert(0, {'novelty_episode':args.novelty_episode})
+    env_list = [make_env(env_name=args.env,
+                             wrappers=env_wrappers,
+                             wrapper_args=wrappers_args) for _ in range(n_envs)]
     env = VecMonitor(DummyVecEnv(env_list))
 
     # Set up and create model

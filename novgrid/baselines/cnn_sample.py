@@ -92,7 +92,9 @@ def main(args):
     # Set up and create model
     policy_kwargs = dict(
         features_extractor_class=MinigridCNN,
-        features_extractor_kwargs=dict(features_dim=128), )
+        features_extractor_kwargs=dict(features_dim=128), 
+        )
+
     model = PPO("CnnPolicy",
                 env,
                 policy_kwargs=policy_kwargs,
@@ -129,9 +131,9 @@ def main(args):
     for exp in range(args.num_exp):
         model.learn(
             total_timesteps=args.total_timesteps,
-            log_interval=args.log_interval,
+ #           log_interval=args.log_interval,
             tb_log_name='run_{}'.format(exp),
-            callback=all_callback,
+#            callback=eval_callback,
         )
         model.save(log_dir + '/' + 'run_{}'.format(exp) + '_final_model')
 

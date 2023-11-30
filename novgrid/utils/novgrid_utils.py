@@ -29,14 +29,14 @@ def make_env(env_name, wrappers=None, wrapper_args=None, novelty_episode=-1):
             assert len(wrapper_args) == len(wrappers)
         if wrappers:
             for idx, wrapper in enumerate(wrappers):
-                if wrapper_args is not None:
-                    if issubclass(wrapper, NoveltyWrapper):
+                if wrapper_args[idx] is not None:
+                    if issubclass(wrapper, NoveltyWrapper) and novelty_episode > 0:
                         print("DEPRECATION WARNING: NoveltyWrapper should be redesigned with novelty_episode as a wrapper arg")
                         env = wrapper(env, novelty_episode=novelty_episode, **wrapper_args[idx])
                     else:
                         env = wrapper(env, **wrapper_args[idx])
                 else:
-                    if issubclass(wrapper, NoveltyWrapper):
+                    if issubclass(wrapper, NoveltyWrapper) and novelty_episode > 0:
                         print("DEPRECATION WARNING: NoveltyWrapper should be redesigned with novelty_episode as a wrapper arg")
                         env = wrapper(env, novelty_episode=novelty_episode)
                     else:
