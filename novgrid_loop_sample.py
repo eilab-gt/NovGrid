@@ -18,6 +18,7 @@ def make_parser() -> argparse.ArgumentParser:
         help="Use a json file for multiple configs.",
     )
     parser.add_argument("--total-steps", "-s", type=int, default=None)
+    parser.add_argument("--novelty-step", "-n", type=int, default=10)
 
     return parser
 
@@ -45,10 +46,8 @@ def run(args: argparse.Namespace) -> None:
         env_configs = json.load(f)
     env_list = make_env_list(env_name=args.env_name, env_configs=env_configs)
 
-    novelty_step = 10
-
     if args.total_steps is None:
-        total_steps = len(env_list) * novelty_step
+        total_steps = len(env_list) * args.novelty_step
     else:
         total_steps = args.total_steps
 
@@ -56,7 +55,7 @@ def run(args: argparse.Namespace) -> None:
     env = None
 
     for step_num in range(total_steps):
-        if step_num % novelty_step == 0:
+        if step_num % args.novelty_step == 0:
             env_idx += 1
             env = env_list[env_idx]
             env.reset()
