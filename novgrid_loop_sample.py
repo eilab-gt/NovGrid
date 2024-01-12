@@ -1,26 +1,36 @@
+from typing import Dict, List, Any
+
 import argparse
 import gymnasium as gym
 import minigrid
 import json
 
 
-parser = argparse.ArgumentParser()
+def make_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser()
 
-parser.add_argument("--env-name", "-e", type=str, default="MiniGrid-Empty-8x8-v0")
-parser.add_argument(
-    "--config-file",
-    "-c",
-    type=str,
-    default="sample.json",
-    help="Use a json file for multiple configs.",
-)
-parser.add_argument("--total-steps", "-s", type=int, default=None)
+    parser.add_argument("--env-name", "-e", type=str, default="MiniGrid-Empty-8x8-v0")
+    parser.add_argument(
+        "--config-file",
+        "-c",
+        type=str,
+        default="sample.json",
+        help="Use a json file for multiple configs.",
+    )
+    parser.add_argument("--total-steps", "-s", type=int, default=None)
+
+    return parser
 
 
-def make_env_list(env_name, env_configs, num_envs=1):
+def make_env_list(
+    env_name: str, env_configs: List[Dict[str, Any]], num_envs: int = 1
+) -> List[gym.Env]:
     env_list = []
 
     for config in env_configs:
+        if "env_name" in config:
+            config = {k: config[k] for k in config if k != "env_name"}
+            env_name = config["env_name"]
         env = gym.make_vec(
             env_name, num_envs=num_envs, vectorization_mode="sync", **config
         )
@@ -30,7 +40,7 @@ def make_env_list(env_name, env_configs, num_envs=1):
     return env_list
 
 
-def run(args):
+def run(args: argparse.Namespace) -> None:
     with open(args.config_file) as f:
         env_configs = json.load(f)
     env_list = make_env_list(env_name=args.env_name, env_configs=env_configs)
@@ -53,10 +63,13 @@ def run(args):
 
         obs, reward, truncated, terminated, info = env.step(env.action_space.sample())
 
-        print(f"env_idx: {env_idx}; step_num: {step_num}; grid_size: {env.envs[0].width}")
+        print(
+            f"env_idx: {env_idx}; step_num: {step_num}; grid_size: {env.envs[0].width}"
+        )
 
 
 if __name__ == "__main__":
+    parser = make_parser()
     args = parser.parse_args()
 
     run(args=args)
