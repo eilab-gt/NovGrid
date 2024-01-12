@@ -15,7 +15,7 @@ def make_parser() -> argparse.ArgumentParser:
         "-c",
         type=str,
         default="sample.json",
-        help="Use a json file for multiple configs.",
+        help="Use the path to a json file here.",
     )
     parser.add_argument("--total-steps", "-s", type=int, default=None)
     parser.add_argument("--novelty-step", "-n", type=int, default=10)
