@@ -30,8 +30,8 @@ def make_env_list(
 
     for config in env_configs:
         if "env_name" in config:
-            config = {k: config[k] for k in config if k != "env_name"}
             env_name = config["env_name"]
+            config = {k: config[k] for k in config if k != "env_name"}
         env = gym.make_vec(
             env_name, num_envs=num_envs, vectorization_mode="sync", **config
         )

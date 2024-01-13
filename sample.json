@@ -6,6 +6,6 @@
     "size": 7
   },
   {
-    "size": 8
+    "env_name": "MiniGrid-Empty-16x16-v0"
   }
 ]
