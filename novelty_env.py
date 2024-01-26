@@ -216,7 +216,7 @@ def run_example(
     else:
         total_time_steps = args.total_time_steps
 
-    for step_num in range(total_time_steps):
+    for step_num in range(0, total_time_steps, args.n_envs):
         observations, rewards, dones, infos = env.step(
             [env.action_space.sample() for _ in range(args.n_envs)]
         )
