@@ -98,14 +98,12 @@ class NoveltyEnv(SubprocVecEnv):
     ):
         if type(env_configs) == str:
             with open(env_configs, "r") as f:
-                self.env_configs = json.load(f)
-        else:
-            self.env_configs = env_configs
+                env_configs = json.load(f)
 
         self.novelty_step = novelty_step
         self.n_envs = n_envs
         self.print_novelty_box = print_novelty_box
-        self.num_transfers = len(self.env_configs) - 1
+        self.num_transfers = len(env_configs) - 1
 
         self.total_time_steps = 0
         self.last_incr = 0
@@ -154,7 +152,7 @@ class NoveltyEnv(SubprocVecEnv):
 
             def _init():
                 # Returns a list env with each env constructed from the config in env_configs
-                return ListEnv([_make_env(config) for config in self.env_configs])
+                return ListEnv([_make_env(config) for config in env_configs])
 
             return _init
 
@@ -202,7 +200,7 @@ def make_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def run_test(
+def run_example(
     args: argparse.Namespace,
 ):
     env = NoveltyEnv(
@@ -231,4 +229,4 @@ if __name__ == "__main__":
     parser = make_parser()
     args = parser.parse_args()
 
-    run_test(args=args)
+    run_example(args=args)
