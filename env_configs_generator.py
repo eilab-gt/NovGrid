@@ -11,7 +11,7 @@ class Change(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def generate_value(self, i: int, num_tasks: int):
+    def generate_value(self, i: int, num_tasks: int) -> Any:
         pass
 
 
@@ -20,7 +20,7 @@ class Constant(Change):
     def __init__(self, x: Any) -> None:
         self.x = x
 
-    def generate_value(self, i: int, num_tasks: int):
+    def generate_value(self, i: int, num_tasks: int) -> Any:
         return self.x
 
 
@@ -32,7 +32,7 @@ class IntRange(Change):
         self.end = end
         self.inclusive = inclusive
 
-    def generate_value(self, i: int, num_tasks: int):
+    def generate_value(self, i: int, num_tasks: int) -> int:
         return (
             self.start + i * (self.end + int(self.inclusive) - self.start) // num_tasks
         )
@@ -47,7 +47,7 @@ class FloatRange(Change):
         self.inclusive = inclusive
         self.__linspace_cache = {}
 
-    def generate_value(self, i: int, num_tasks: int):
+    def generate_value(self, i: int, num_tasks: int) -> float:
         if num_tasks not in self.__linspace_cache:
             self.__linspace_cache[num_tasks] = np.linspace(
                 self.start, self.end, num=num_tasks, endpoint=self.inclusive
@@ -62,8 +62,20 @@ class Toggle(Change):
         self.val1 = val1
         self.val2 = val2
 
-    def generate_value(self, i: int, num_tasks: int):
+    def generate_value(self, i: int, num_tasks: int) -> Any:
         return self.val1 if i % 2 == 0 else self.val2
+
+
+class ListChange(Change):
+
+    def __init__(self, lst: List[Any], use_bounce_back_boundary: bool = False) -> None:
+        super().__init__()
+        self.lst = lst
+        if use_bounce_back_boundary:
+            self.lst = self.lst + self.lst[-2:0:-1]
+
+    def generate_value(self, i: int, num_tasks: int) -> Any:
+        return self.lst[i % len(self.lst)]
 
 
 class EnvConfigGenerator:
