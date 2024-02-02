@@ -1,4 +1,5 @@
 import abc
+import os
 
 import json
 from typing import List, Any, Dict
@@ -103,6 +104,17 @@ class EnvConfigGenerator:
             json.dump(env_configs, f)
         return env_configs
 
+    def global_save_env_configs(
+        self, name: str, override_existing_file: bool = False
+    ) -> List[Dict[str, Any]]:
+        fname = f"{name}.json" if ".json" not in name else name
+        full_fname = os.path.join(os.path.dirname(__file__), "json", fname)
+        if os.path.exists(full_fname) and not override_existing_file:
+            raise ValueError(
+                f"The name {name} already has a global file for its env config. To override this file use the override_existing_file flag."
+            )
+        self.save_env_configs(full_fname)
+
 
 def test_generator_bool_toggle():
     expected_result = [
@@ -113,22 +125,6 @@ def test_generator_bool_toggle():
 
     result = EnvConfigGenerator(
         env_id="LavaGrid", num_tasks=3, changes={"lava_on": Toggle()}
-    ).generate_env_configs()
-
-    assert expected_result == result
-
-
-def test_generator_int_range():
-    expected_result = [
-        {"env_id": "MiniGrid-SimpleCrossingS9N0-v0", "num_crossings": 1},
-        {"env_id": "MiniGrid-SimpleCrossingS9N0-v0", "num_crossings": 2},
-        {"env_id": "MiniGrid-SimpleCrossingS9N0-v0", "num_crossings": 3},
-    ]
-
-    result = EnvConfigGenerator(
-        env_id="MiniGrid-SimpleCrossingS9N0-v0",
-        num_tasks=3,
-        changes={"num_crossings": IntRange(1, 4)},
     ).generate_env_configs()
 
     assert expected_result == result

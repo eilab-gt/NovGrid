@@ -1,0 +1,5 @@
+[
+  { "env_id": "MiniGrid-SimpleCrossingS9N0-v0", "num_crossings": 1 },
+  { "env_id": "MiniGrid-SimpleCrossingS9N0-v0", "num_crossings": 2 },
+  { "env_id": "MiniGrid-SimpleCrossingS9N0-v0", "num_crossings": 3 }
+]
