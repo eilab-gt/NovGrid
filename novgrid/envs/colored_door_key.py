@@ -1,14 +1,14 @@
-from typing import Optional, Any, Dict, List
+from typing import Optional, Any, Dict, List, SupportsFloat
 
 from minigrid.core.grid import Grid
 from minigrid.core.world_object import Door, Goal, Key
 from minigrid.core.mission import MissionSpace
 from minigrid.minigrid_env import MiniGridEnv
 
-from novgrid.novelty_generation.novelty_objs import ColorDoor
+from novgrid.envs.novgrid_objects import ColorDoor
 
 
-class DoorKeyChange(MiniGridEnv):
+class ColoredDoorKeyEnv(MiniGridEnv):
 
     def __init__(
         self,
@@ -32,6 +32,9 @@ class DoorKeyChange(MiniGridEnv):
     @staticmethod
     def _gen_mission():
         return "use the correct key to open the door and get to the goal"
+
+    def step(self, action):
+        return super().step(action)
 
     def _gen_grid(self, width: int, height: int):
         # Create an empty grid

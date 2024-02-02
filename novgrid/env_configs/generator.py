@@ -1,7 +1,7 @@
 import abc
 
 import json
-from typing import List, Union, Optional, Any, Dict
+from typing import List, Any, Dict
 import numpy as np
 
 
@@ -52,7 +52,7 @@ class FloatRange(Change):
             self.__linspace_cache[num_tasks] = np.linspace(
                 self.start, self.end, num=num_tasks, endpoint=self.inclusive
             )
-        return self.__linspace_cache[num_tasks]
+        return self.__linspace_cache[num_tasks][i]
 
 
 class Toggle(Change):
@@ -104,112 +104,111 @@ class EnvConfigGenerator:
         return env_configs
 
 
-def generate_config_json(
-    base_env: str,
-    num_tasks: int = 0,
-    change_vars: Optional[List[str]] = None,
-    change_types: Optional[List[type]] = None,
-    change_ranges: Optional[List[Union[tuple, None]]] = None,
-):
-    """
-    base_env : str, the name of the env_id
-    num_tasks : the number of changes (so the number of resulting environments is cahnge_count+1),
-    change_vars : the list of kwarg variable names to change,
-    change_types : the list of types of the kwarg variables to change, options 'bool', 'int', or 'float'
-    change_ranges : the ranges of the kwarg variables to change if type is not bool.
-                    Each must be len == 2 or None for bool.
-                    For an int will return the largest subinterval divisible by num_taskss.
-    """
-    if change_ranges is not None:
-        for r in change_ranges:
-            assert r is None or len(r) == 2
-
-    json_data = []
-    # for n in range(num_tasks):
-    var_values = {}
-    for idx, var in enumerate(change_vars):
-        if change_types[idx] is bool:
-            var_values[var] = [bool(i % 2) for i in range(num_tasks)]
-        elif change_types[idx] is int:
-            var_values[var] = [
-                val * (change_ranges[idx][1] - change_ranges[idx][0]) // num_tasks
-                + change_ranges[idx][0]
-                for val in range(num_tasks)
-            ]
-        elif change_types[idx] is float:
-            var_values[var] = list(np.linspace(*change_ranges[idx]), num_tasks)
-        else:
-            raise TypeError
-    for i in range(num_tasks):
-        json_data.append(
-            {
-                "env_id": base_env,
-                **dict(map(lambda x: (x[0], x[1][i]), var_values.items())),
-            }
-        )
-    return json_data
-
-
-def assert_value(ground_truth, value):
-    try:
-        assert ground_truth == value
-    except:
-        print("Test Failed!")
-        print("Expected:", ground_truth)
-        print("Received:", value)
-
-
-def test1():
-    case1 = [
+def test_generator_bool_toggle():
+    expected_result = [
         {"env_id": "LavaGrid", "lava_on": False},
         {"env_id": "LavaGrid", "lava_on": True},
         {"env_id": "LavaGrid", "lava_on": False},
     ]
 
-    case2 = [
+    result = EnvConfigGenerator(
+        env_id="LavaGrid", num_tasks=3, changes={"lava_on": Toggle()}
+    ).generate_env_configs()
+
+    assert expected_result == result
+
+
+def test_generator_int_range():
+    expected_result = [
         {"env_id": "MiniGrid-SimpleCrossingS9N0-v0", "num_crossings": 1},
         {"env_id": "MiniGrid-SimpleCrossingS9N0-v0", "num_crossings": 2},
         {"env_id": "MiniGrid-SimpleCrossingS9N0-v0", "num_crossings": 3},
     ]
 
-    assert_value(case1, generate_config_json("LavaGrid", 3, ["lava_on"], [bool]))
-    assert_value(
-        case2,
-        generate_config_json(
-            "MiniGrid-SimpleCrossingS9N0-v0", 3, ["num_crossings"], [int], [(1, 4)]
-        ),
-    )
+    result = EnvConfigGenerator(
+        env_id="MiniGrid-SimpleCrossingS9N0-v0",
+        num_tasks=3,
+        changes={"num_crossings": IntRange(1, 4)},
+    ).generate_env_configs()
+
+    assert expected_result == result
 
 
-def test2():
-    case1 = [
-        {"env_id": "LavaGrid", "lava_on": False},
-        {"env_id": "LavaGrid", "lava_on": True},
-        {"env_id": "LavaGrid", "lava_on": False},
-    ]
-
-    case2 = [
+def test_generator_int_range():
+    expected_result = [
         {"env_id": "MiniGrid-SimpleCrossingS9N0-v0", "num_crossings": 1},
         {"env_id": "MiniGrid-SimpleCrossingS9N0-v0", "num_crossings": 2},
         {"env_id": "MiniGrid-SimpleCrossingS9N0-v0", "num_crossings": 3},
     ]
 
-    assert_value(
-        case1,
-        EnvConfigGenerator(
-            env_id="LavaGrid", num_tasks=3, changes={"lava_on": Toggle()}
-        ).generate_env_configs(),
-    )
-    assert_value(
-        case2,
-        EnvConfigGenerator(
-            env_id="MiniGrid-SimpleCrossingS9N0-v0",
-            num_tasks=3,
-            changes={"num_crossings": IntRange(1, 4)},
-        ).generate_env_configs(),
-    )
+    result = EnvConfigGenerator(
+        env_id="MiniGrid-SimpleCrossingS9N0-v0",
+        num_tasks=3,
+        changes={"num_crossings": IntRange(1, 4)},
+    ).generate_env_configs()
+
+    assert expected_result == result
 
 
-if __name__ == "__main__":
-    test1()
-    test2()
+def test_generator_list_change():
+    expected_result = [
+        {"env_id": "MiniGrid-SimpleCrossingS9N0-v0", "num_crossings": 1},
+        {"env_id": "MiniGrid-SimpleCrossingS9N0-v0", "num_crossings": 2},
+        {"env_id": "MiniGrid-SimpleCrossingS9N0-v0", "num_crossings": 3},
+        {"env_id": "MiniGrid-SimpleCrossingS9N0-v0", "num_crossings": 2},
+        {"env_id": "MiniGrid-SimpleCrossingS9N0-v0", "num_crossings": 1},
+        {"env_id": "MiniGrid-SimpleCrossingS9N0-v0", "num_crossings": 2},
+    ]
+
+    result = EnvConfigGenerator(
+        env_id="MiniGrid-SimpleCrossingS9N0-v0",
+        num_tasks=6,
+        changes={"num_crossings": ListChange([1, 2, 3], use_bounce_back_boundary=True)},
+    ).generate_env_configs()
+
+    assert expected_result == result
+
+
+def test_generator_float_range():
+    expected_result = [
+        {"env_id": "CartPole", "pole_weight": 5.0},
+        {"env_id": "CartPole", "pole_weight": 6.5},
+        {"env_id": "CartPole", "pole_weight": 8.0},
+        {"env_id": "CartPole", "pole_weight": 9.5},
+    ]
+
+    result = EnvConfigGenerator(
+        env_id="CartPole",
+        num_tasks=4,
+        changes={"pole_weight": FloatRange(5.0, 9.5, inclusive=True)},
+    ).generate_env_configs()
+
+    assert expected_result == result
+
+
+def test_generator_multi_change():
+    expected_result = [
+        {
+            "env_id": "MiniGrid-SimpleCrossingS9N0-v0",
+            "num_crossings": 1,
+            "test_constant": 5,
+        },
+        {
+            "env_id": "MiniGrid-SimpleCrossingS9N0-v0",
+            "num_crossings": 2,
+            "test_constant": 5,
+        },
+        {
+            "env_id": "MiniGrid-SimpleCrossingS9N0-v0",
+            "num_crossings": 3,
+            "test_constant": 5,
+        },
+    ]
+
+    result = EnvConfigGenerator(
+        env_id="MiniGrid-SimpleCrossingS9N0-v0",
+        num_tasks=3,
+        changes={"num_crossings": IntRange(1, 4), "test_constant": Constant(5)},
+    ).generate_env_configs()
+
+    assert expected_result == result

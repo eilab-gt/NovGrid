@@ -1,8 +1,7 @@
-from typing import Any, Callable, List, Optional, SupportsFloat, Tuple, Dict, Union
+from typing import Any, List, Optional, SupportsFloat, Tuple, Dict, Union
 
 import os
 
-import argparse
 import gymnasium as gym
 import json
 import numpy as np
@@ -13,9 +12,13 @@ from stable_baselines3.common.vec_env.base_vec_env import VecEnvStepReturn
 
 import minigrid
 
+from novgrid.env_configs import get_env_configs
+
 
 class ListEnv(gym.Env):
-    def __init__(self, env_lst: List[gym.Env]) -> None:
+    def __init__(
+        self, env_lst: List[gym.Env]
+    ) -> None:
         self.env_lst = env_lst
         self.env_idx = 0
 
@@ -71,14 +74,10 @@ class ListEnv(gym.Env):
     @property
     def np_random(self):
         return self.cur_env.np_random
-
+    
     @property
-    def width(self):
-        return self.cur_env.width
-
-    @property
-    def height(self):
-        return self.cur_env.height
+    def render_mode(self):
+        return self.cur_env.render_mode
 
 
 class NoveltyEnv(SubprocVecEnv):
@@ -95,10 +94,14 @@ class NoveltyEnv(SubprocVecEnv):
         monitor_kwargs: Optional[str] = None,
         start_method: Optional[str] = None,
         print_novelty_box: bool = False,
+        render_mode: Optional[str] = None,
     ):
         if type(env_configs) == str:
-            with open(env_configs, "r") as f:
-                env_configs = json.load(f)
+            if os.path.exists(env_configs):
+                with open(env_configs, "r") as f:
+                    env_configs = json.load(f)
+            else:
+                env_configs = get_env_configs(env_configs)
 
         self.novelty_step = novelty_step
         self.n_envs = n_envs
@@ -119,9 +122,9 @@ class NoveltyEnv(SubprocVecEnv):
 
                 # Initialize the environment
                 if isinstance(env_id, str):
-                    env = gym.make(env_id, **env_kwargs)
+                    env = gym.make(env_id, render_mode=render_mode, **env_kwargs)
                 else:
-                    env = env_id(**env_kwargs)
+                    env = env_id(**env_kwargs, render_mode=render_mode)
 
                 # Optionally use the random seed provided
                 if seed is not None:
@@ -177,76 +180,3 @@ class NoveltyEnv(SubprocVecEnv):
                 print("-" * len(s))
 
         return observations, rewards, dones, infos
-
-
-ENV_CONFIG_FILE = "sample2.json"
-TOTAL_TIME_STEPS = None
-NOVELTY_STEP = 10
-N_ENVS = 1
-
-
-def make_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        "--env-config-file",
-        "-ec",
-        type=str,
-        default=ENV_CONFIG_FILE,
-        help="Use the path to a json file containing the env configs here.",
-    )
-    parser.add_argument(
-        "--total-time-steps",
-        "-t",
-        type=int,
-        default=TOTAL_TIME_STEPS,
-        help="The total number of time steps to run.",
-    )
-    parser.add_argument(
-        "--novelty-step",
-        "-n",
-        type=int,
-        default=NOVELTY_STEP,
-        help="The total number of time steps to run in an environment before injecting the next novelty.",
-    )
-    parser.add_argument(
-        "--n-envs",
-        "-e",
-        type=int,
-        default=N_ENVS,
-        help="The number of envs to use when running the vectorized env.",
-    )
-
-    return parser
-
-
-def run_example(
-    args: argparse.Namespace,
-):
-    env = NoveltyEnv(
-        env_configs=args.env_config_file,
-        novelty_step=args.novelty_step,
-        n_envs=args.n_envs,
-    )
-
-    env.reset()
-
-    if args.total_time_steps is None:
-        total_time_steps = (env.num_transfers + 1) * args.novelty_step
-    else:
-        total_time_steps = args.total_time_steps
-
-    for step_num in range(0, total_time_steps, args.n_envs):
-        observations, rewards, dones, infos = env.step(
-            [env.action_space.sample() for _ in range(args.n_envs)]
-        )
-        print(
-            f"step_num: {step_num}; env_idx: {env.get_attr('env_idx')}; size: {env.get_attr('width')}"
-        )
-
-
-if __name__ == "__main__":
-    parser = make_parser()
-    args = parser.parse_args()
-
-    run_example(args=args)

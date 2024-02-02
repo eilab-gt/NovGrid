@@ -1,0 +1,14 @@
+[
+  {
+    "env_id": "NovGrid-ColoredDoorKeyEnv",
+    "door_color": "red",
+    "correct_key_color": "red",
+    "key_colors": ["red", "blue"]
+  },
+  {
+    "env_id": "NovGrid-ColoredDoorKeyEnv",
+    "door_color": "red",
+    "correct_key_color": "blue",
+    "key_colors": ["red", "blue"]
+  }
+]
