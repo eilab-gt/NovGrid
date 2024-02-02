@@ -13,14 +13,14 @@ class DoorKeyChange(MiniGridEnv):
     def __init__(
         self,
         door_color: str = "yellow",
-        key_colors: List[str] = ["yellow"],
+        key_colors: Optional[List[str]] = None,
         correct_key_color: str = "yellow",
         size: int = 8,
         max_steps: Optional[int] = None,
         **kwargs: Dict[str, Any]
     ):
         self.door_color = door_color
-        self.key_colors = key_colors
+        self.key_colors = key_colors if key_colors is not None else [correct_key_color]
         self.correct_key_color = correct_key_color
         if max_steps is None:
             max_steps = 10 * size**2
