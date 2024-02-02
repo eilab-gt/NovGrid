@@ -7,7 +7,7 @@ from novgrid.config import make_parser
 
 def run_example(
     args: argparse.Namespace,
-):
+) -> None:
     env = NoveltyEnv(
         env_configs=args.env_configs_file,
         novelty_step=args.novelty_step,
