@@ -28,7 +28,9 @@ def run_example(
         )
         if args.render_display:
             env.render("human")
-        print(f"step_num: {step_num}; env_idx: {env.get_attr('env_idx')};")
+        print(
+            f"step_num: {step_num}; env_idx: {env.get_attr('env_idx')}; rewards: {rewards}; dones: {dones}"
+        )
 
         if args.step_delay > 0:
             time.sleep(args.step_delay)
