@@ -12,7 +12,8 @@ setup(
     install_requires=[
         'numpy>=1.15.0',
         'gymnasium',
-        'minigrid'
+        'minigrid',
+        'stable_baselines3',
     ],
     data_files=glob.glob('novgrid/env_configs/json/*.json')
 )
