@@ -49,37 +49,48 @@ model = PPO('MlpPolicy', env)
 model.learn(config['total_timesteps'])
 ```
 
-## Training and Testing the Installation
+## Testing the Installation
 
-`TODO: update this with new baselines for the new library.`
+To run the sample environment set follow the instructions below. 
 
-NOTE: these do not work with the new 0.0.2 version.
-
-To run the baseline agent, clone the repository and from the NovGrid base directory follow the instructions below. 
-
-Install [Pytorch](https://pytorch.org/get-started/locally/)
-
-Get dependencies:
 ```shell
-pip install -r requirements.txt
+python novgrid/example.py
 ```
 
-Move into baselines directory:
-```shell
-cd novgrid/baselines
+The expected output should be:
 ```
-
-Train from scratch on DoorKeyChange novelty:
-
-```shell
-python ppo_minigrid.py --novelty_wrapper=DoorKeyChange
-```
-
-Loading existing model and train on DoorKeyChange novelty:
-
-```shell
-python ppo_minigrid.py --load_model=models/ppo_minigrid_example_model.zip
-
+pygame 2.5.2 (SDL 2.28.2, Python 3.8.18)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+step_num: 0; env_idx: [0]; rewards: [0]; dones: [False]
+step_num: 1; env_idx: [0]; rewards: [0]; dones: [False]
+step_num: 2; env_idx: [0]; rewards: [0]; dones: [False]
+step_num: 3; env_idx: [0]; rewards: [0]; dones: [False]
+step_num: 4; env_idx: [0]; rewards: [0]; dones: [False]
+step_num: 5; env_idx: [0]; rewards: [0]; dones: [False]
+step_num: 6; env_idx: [0]; rewards: [0]; dones: [False]
+step_num: 7; env_idx: [0]; rewards: [0]; dones: [False]
+step_num: 8; env_idx: [0]; rewards: [0]; dones: [False]
+step_num: 9; env_idx: [0]; rewards: [0]; dones: [False]
+step_num: 10; env_idx: [1]; rewards: [0]; dones: [ True]
+step_num: 11; env_idx: [1]; rewards: [0]; dones: [False]
+step_num: 12; env_idx: [1]; rewards: [0]; dones: [False]
+step_num: 13; env_idx: [1]; rewards: [0]; dones: [False]
+step_num: 14; env_idx: [1]; rewards: [0]; dones: [False]
+step_num: 15; env_idx: [1]; rewards: [0]; dones: [False]
+step_num: 16; env_idx: [1]; rewards: [0]; dones: [False]
+step_num: 17; env_idx: [1]; rewards: [0]; dones: [False]
+step_num: 18; env_idx: [1]; rewards: [0]; dones: [False]
+step_num: 19; env_idx: [1]; rewards: [0]; dones: [False]
+step_num: 20; env_idx: [1]; rewards: [0]; dones: [False]
+step_num: 21; env_idx: [2]; rewards: [0]; dones: [ True]
+step_num: 22; env_idx: [2]; rewards: [0]; dones: [False]
+step_num: 23; env_idx: [2]; rewards: [0]; dones: [False]
+step_num: 24; env_idx: [2]; rewards: [0]; dones: [False]
+step_num: 25; env_idx: [2]; rewards: [0]; dones: [False]
+step_num: 26; env_idx: [2]; rewards: [0]; dones: [False]
+step_num: 27; env_idx: [2]; rewards: [0]; dones: [False]
+step_num: 28; env_idx: [2]; rewards: [0]; dones: [False]
+step_num: 29; env_idx: [2]; rewards: [0]; dones: [False]
 ```
 
 ## Novelties
