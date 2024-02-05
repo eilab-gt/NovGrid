@@ -1,6 +1,5 @@
-configargparse
-gym
-gym-minigrid
+gymnasium
+minigrid
 numpy
 pandas
 pathtools

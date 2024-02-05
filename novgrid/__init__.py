@@ -1,6 +1,5 @@
-# Import the envs module so that envs register themselves
-import novgrid.envs
+from novgrid.novelty_env import NoveltyEnv
 
-# Import wrappers so it's accessible when installing with pip
-import novgrid.novelty_generation
-import novgrid
+from novgrid.register_envs import register_novgrid_envs
+
+register_novgrid_envs()

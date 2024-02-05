@@ -1,6 +1,6 @@
 # NovGrid
 
-Novelty MiniGrid (NovGrid) is an extension of [MiniGrid](https://github.com/maximecb/gym-minigrid) environment that allows for the world properties and dynamics to change according to a generalized novelty generator. The MiniGrid environment is a grid-world that facilitates reinforcement learning algorithm development with low environment integration overhead, which allows for rapid iteration and testing. In addition to necessary grid world objects of agents, floor, walls, and goals, MiniGrid implements actionable objects including doors, keys, balls, and boxes.  NovGrid extends the MiniGrid  environment by expanding the way the grid world and the agent interact to allow novelties to be injected into the environment. Specifically this is done by expanding the functionality of the actionable objects (doors, keys, lava, etc.) already in MiniGrid and creating a general environment wrapper that injects novelty at a certain point in the training process.
+Novelty MiniGrid (NovGrid) is an extension of [MiniGrid](https://github.com/Farama-Foundation/Minigrid) environment that allows for the world properties and dynamics to change according to a generalized novelty generator. The MiniGrid environment is a grid-world that facilitates reinforcement learning algorithm development with low environment integration overhead, which allows for rapid iteration and testing. In addition to necessary grid world objects of agents, floor, walls, and goals, MiniGrid implements actionable objects including doors, keys, balls, and boxes.  NovGrid extends the MiniGrid  environment by expanding the way the grid world and the agent interact to allow novelties to be injected into the environment. Specifically this is done by expanding the functionality of the actionable objects (doors, keys, lava, etc.) already in MiniGrid and creating a general environment wrapper that injects novelty at a certain point in the training process.
 
 
 If you find this code useful, please reference in your paper:
@@ -16,7 +16,7 @@ If you find this code useful, please reference in your paper:
 
 ## Installing the NovGrid Package
 Requirements:
-- Python 3.6+
+- Python 3.8+
 
 From the NovGrid base directory run:
 ```shell
@@ -28,18 +28,22 @@ pip install -e .
 Here is an example that trains a [Stable Baselines3](https://stable-baselines3.readthedocs.io/en/master/) implementation of PPO on a NovGrid environment that experiences the DoorKeyChange novelty:
 
 ```python
-import gym
-import gym_minigrid
+import gymnasium as gym
 from stable_baselines3 import PPO
+import minigrid
 import novgrid
 
 config = {
+    'env_configs': 'door_key_change'
     'total_timesteps': 10000000,
-    'novelty_episode': 10000
+    'novelty_step': 10000
 }
-env = gym.make('MiniGrid-DoorKey-6x6-v0')
-env = novgrid.novelty_generation.novelty_wrappers.DoorKeyChange(env, novelty_episode=config['novelty_episode'])
-env = gym_minigrid.wrappers.FlatObsWrapper(env)
+
+env = novgrid.NoveltyEnv(
+    env_configs=config['env_configs'],
+    novelty_step=config['novelty_step'],
+    wrappers=[minigrid.wrappers.FlatObsWrapper]
+)
 
 model = PPO('MlpPolicy', env)
 model.learn(config['total_timesteps'])
@@ -47,7 +51,11 @@ model.learn(config['total_timesteps'])
 
 ## Training and Testing the Installation
 
-To run the baseline agent, clone the repository and from the NovGrid base directory follow the instructions below.
+`TODO: update this with new baselines for the new library.`
+
+NOTE: these do not work with the new 0.0.2 version.
+
+To run the baseline agent, clone the repository and from the NovGrid base directory follow the instructions below. 
 
 Install [Pytorch](https://pytorch.org/get-started/locally/)
 

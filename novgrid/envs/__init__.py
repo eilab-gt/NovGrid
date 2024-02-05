@@ -1,2 +1,1 @@
-from novgrid.envs.multidoormultikey import *
-from novgrid.envs.lavagapdoorkey import *
+from novgrid.envs.colored_door_key import ColoredDoorKeyEnv

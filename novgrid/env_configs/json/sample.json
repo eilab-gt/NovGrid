@@ -1,0 +1,13 @@
+[
+  {
+    "env_id": "MiniGrid-Empty-16x16-v0",
+    "size": 10
+  },
+  {
+    "env_id": "MiniGrid-Empty-16x16-v0",
+    "size": 8
+  },
+  {
+    "env_id": "MiniGrid-Empty-16x16-v0"
+  }
+]
