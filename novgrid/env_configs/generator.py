@@ -46,14 +46,14 @@ class FloatRange(Change):
         self.start = start
         self.end = end
         self.inclusive = inclusive
-        self.__linspace_cache = {}
+        self._linspace_cache = {}
 
     def generate_value(self, i: int, num_tasks: int) -> float:
-        if num_tasks not in self.__linspace_cache:
-            self.__linspace_cache[num_tasks] = np.linspace(
+        if num_tasks not in self._linspace_cache:
+            self._linspace_cache[num_tasks] = np.linspace(
                 self.start, self.end, num=num_tasks, endpoint=self.inclusive
             )
-        return self.__linspace_cache[num_tasks][i]
+        return self._linspace_cache[num_tasks][i]
 
 
 class Toggle(Change):
@@ -69,10 +69,10 @@ class Toggle(Change):
 
 class ListChange(Change):
 
-    def __init__(self, lst: List[Any], use_bounce_back_boundary: bool = False) -> None:
+    def __init__(self, lst: List[Any], use_snake_boundary: bool = False) -> None:
         super().__init__()
         self.lst = lst
-        if use_bounce_back_boundary:
+        if use_snake_boundary:
             self.lst = self.lst + self.lst[-2:0:-1]
 
     def generate_value(self, i: int, num_tasks: int) -> Any:
