@@ -14,5 +14,5 @@ setup(
         'gymnasium',
         'minigrid'
     ],
-    data_files=glob.glob('novgrid/env_configs/*.json')
+    data_files=glob.glob('novgrid/env_configs/json/*.json')
 )
