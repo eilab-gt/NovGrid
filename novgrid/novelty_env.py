@@ -10,8 +10,6 @@ from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import SubprocVecEnv
 from stable_baselines3.common.vec_env.base_vec_env import VecEnvStepReturn
 
-import minigrid
-
 from novgrid.env_configs import get_env_configs
 
 
