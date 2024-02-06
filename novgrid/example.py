@@ -8,6 +8,11 @@ from novgrid.config import make_parser
 def run_example(
     args: argparse.Namespace,
 ) -> None:
+    """Run an example run with random actions to test a given configuration
+
+    Args:
+        args (argparse.Namespace): The args from the default parser
+    """
     env = NoveltyEnv(
         env_configs=args.env_configs_file,
         novelty_step=args.novelty_step,
