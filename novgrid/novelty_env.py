@@ -5,18 +5,18 @@ import os
 import gymnasium as gym
 import json
 import numpy as np
+import inspect
 
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import SubprocVecEnv
 from stable_baselines3.common.vec_env.base_vec_env import VecEnvStepReturn
 
 from novgrid.env_configs import get_env_configs
+import novgrid.envs.novgrid_objects as novgrid_objects
 
 
 class ListEnv(gym.Env):
-    def __init__(
-        self, env_lst: List[gym.Env]
-    ) -> None:
+    def __init__(self, env_lst: List[gym.Env]) -> None:
         self.env_lst = env_lst
         self.env_idx = 0
 
@@ -72,7 +72,7 @@ class ListEnv(gym.Env):
     @property
     def np_random(self):
         return self.cur_env.np_random
-    
+
     @property
     def render_mode(self):
         return self.cur_env.render_mode
@@ -100,6 +100,23 @@ class NoveltyEnv(SubprocVecEnv):
                     env_configs = json.load(f)
             else:
                 env_configs = get_env_configs(env_configs)
+
+        world_objects = {
+            k.lower(): v
+            for k, v in inspect.getmembers(
+                novgrid_objects,
+                lambda obj: inspect.isclass(obj)
+                and issubclass(obj, novgrid_objects.WorldObj),
+            )
+        }
+
+        for cfg in env_configs:
+            for k, v in cfg.items():
+                if (
+                    v.startswith("gridobj:")
+                    and v.split(":")[-1].lower() in world_objects
+                ):
+                    cfg[k] = world_objects[v.split(":")[-1].lower()]
 
         self.novelty_step = novelty_step
         self.n_envs = n_envs
