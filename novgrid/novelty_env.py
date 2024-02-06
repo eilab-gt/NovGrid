@@ -3,6 +3,7 @@ from typing import Any, List, Optional, SupportsFloat, Tuple, Dict, Union
 import os
 
 import gymnasium as gym
+from gymnasium.envs.registration import EnvSpec
 import json
 import numpy as np
 import inspect
@@ -20,7 +21,7 @@ class ListEnv(gym.Env):
     A vectorized environment that chains multiple environments together.
 
     Attributes:
-        env_lst (List[gym.Env]): List of environments to chain.
+        env_lst (List[gymnasium.Env]): List of environments to chain.
         env_idx (int): Index of the current environment.
     """
 
@@ -29,7 +30,7 @@ class ListEnv(gym.Env):
         Initializes the ListEnv with a list of environments.
 
         Args:
-            env_lst (List[gym.Env]): List of environments to chain.
+            env_lst (List[gymnasium.Env]): List of environments to chain.
         """
         self.env_lst = env_lst
         self.env_idx = 0
@@ -82,7 +83,7 @@ class ListEnv(gym.Env):
         Renders the current environment.
 
         Returns:
-            Union[gym.core.RenderFrame, List[gym.core.RenderFrame], None]: Rendered frame(s).
+            Union[gymnasium.core.RenderFrame, List[gymnasium.core.RenderFrame], None]: Rendered frame(s).
         """
         return self.cur_env.render()
 
@@ -97,7 +98,7 @@ class ListEnv(gym.Env):
         Gets the current environment.
 
         Returns:
-            gym.Env: Current environment.
+            gymnasium.Env: Current environment.
         """
         return self.env_lst[self.env_idx]
 
@@ -107,7 +108,7 @@ class ListEnv(gym.Env):
         Gets the unwrapped version of the current environment.
 
         Returns:
-            gym.Env: Unwrapped current environment.
+            gymnasium.Env: Unwrapped current environment.
         """
         return self.cur_env
 
@@ -117,7 +118,7 @@ class ListEnv(gym.Env):
         Gets the action space of the current environment.
 
         Returns:
-            gym.Space: Action space.
+            gymnasium.Space: Action space.
         """
         return self.cur_env.action_space
 
@@ -127,7 +128,7 @@ class ListEnv(gym.Env):
         Gets the observation space of the current environment.
 
         Returns:
-            gym.Space: Observation space.
+            gymnasium.Space: Observation space.
         """
         return self.cur_env.observation_space
 
@@ -142,12 +143,12 @@ class ListEnv(gym.Env):
         return self.cur_env.reward_range
 
     @property
-    def spec(self) -> gym.EnvSpec:
+    def spec(self) -> EnvSpec:
         """
         Gets the spec of the current environment.
 
         Returns:
-            gym.EnvSpec: Environment specification.
+            gymnasium.EnvSpec: Environment specification.
         """
         return self.cur_env.spec
 
@@ -208,7 +209,7 @@ class NoveltyEnv(SubprocVecEnv):
         Args:
             env_configs (Union[str, List[Dict[str, Any]]]): Configuration for environments.
             novelty_step (int): Number of time steps between novelty injections.
-            wrappers (List[gym.Wrapper]): List of wrappers to apply to each environment.
+            wrappers (List[gymnasium.Wrapper]): List of wrappers to apply to each environment.
             wrapper_kwargs_lst (List[Dict[str, Any]]): List of wrapper kwargs for each wrapper.
             n_envs (int): Number of environments to run in parallel.
             seed (Optional[int]): Random seed.

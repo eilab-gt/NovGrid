@@ -242,7 +242,7 @@ class EnvConfigGenerator:
         """
         env_configs = self.generate_env_configs()
         with open(json_file_name, "w") as f:
-            json.dump(env_configs, f)
+            json.dump(env_configs, f, indent=2)
         return env_configs
 
     def global_save_env_configs(
