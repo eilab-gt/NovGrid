@@ -239,7 +239,8 @@ class NoveltyEnv(SubprocVecEnv):
         for cfg in env_configs:
             for k, v in cfg.items():
                 if (
-                    v.startswith("gridobj:")
+                    type(v) == str
+                    and v.startswith("gridobj:")
                     and v.split(":")[-1].lower() in world_objects
                 ):
                     cfg[k] = world_objects[v.split(":")[-1].lower()]
