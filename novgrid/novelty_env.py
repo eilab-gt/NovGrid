@@ -303,6 +303,10 @@ class NoveltyEnv(SubprocVecEnv):
 
         env_fns = [make_env_fn(rank=i + start_index) for i in range(n_envs)]
 
+        if start_method is None:
+            import multiprocessing as mp
+            start_method = "fork" if "fork" in mp.get_all_start_methods() else None
+
         super().__init__(env_fns=env_fns, start_method=start_method)
 
     def step(self, actions: np.ndarray) -> VecEnvStepReturn:
