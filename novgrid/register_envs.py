@@ -5,6 +5,9 @@ import inspect
 
 
 def register_novgrid_envs() -> None:
+    """
+    Registers all the novgrid environments with gymnasium
+    """
     [
         register(id=f"NovGrid-{name}", entry_point=f"novgrid.envs:{name}")
         for name, _ in inspect.getmembers(
