@@ -247,6 +247,7 @@ class NoveltyEnv(SubprocVecEnv):
 
         self.novelty_step = novelty_step
         self.n_envs = n_envs
+        self.n_tasks = len(env_configs)
         self.print_novelty_box = print_novelty_box
         self.num_transfers = len(env_configs) - 1
 
