@@ -1,7 +1,7 @@
-from typing import Optional, Any, Dict, List, SupportsFloat
+from typing import Optional, Any, Dict, List
 
 from minigrid.core.grid import Grid
-from minigrid.core.world_object import Door, Goal, Key
+from minigrid.core.world_object import Goal, Key
 from minigrid.core.mission import MissionSpace
 from minigrid.minigrid_env import MiniGridEnv
 
