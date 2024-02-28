@@ -2,6 +2,7 @@ from typing import Optional, Any, Dict
 
 from minigrid.core.grid import Grid
 from minigrid.core.world_object import Goal, Lava, WorldObj
+from minigrid.core.mission import MissionSpace
 from minigrid.minigrid_env import MiniGridEnv
 
 
@@ -27,7 +28,17 @@ class LavaShortcutMaze(MiniGridEnv):
         if max_steps is None:
             max_steps = 10 * size**2
 
-        super().__init__(grid_size=size, max_steps=max_steps, **kwargs)
+        mission_space = MissionSpace(mission_func=self._gen_mission)
+
+        super().__init__(
+            mission_space=mission_space, grid_size=size, max_steps=max_steps, **kwargs
+        )
+
+    @staticmethod
+    def _gen_mission():
+        return (
+            "Avoid the lava and use the key to open the door and then get to the goal"
+        )
 
     def _gen_grid(self, width, height):
         # Create an empty grid
@@ -87,7 +98,7 @@ class LavaShortcutMaze(MiniGridEnv):
 
     def step(self, action):
         fwd_pos = self.front_pos
-        fwd_cell = self.grid.get(*self.cur)
+        fwd_cell = self.grid.get(*fwd_pos)
         obs, reward, terminated, truncated, info = super().step(action)
         if (
             self.lava_safe
