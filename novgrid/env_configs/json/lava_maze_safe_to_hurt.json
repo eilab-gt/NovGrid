@@ -1,0 +1,10 @@
+[
+  {
+    "env_id": "NovGrid-LavaShortcutMaze",
+    "lava_safe": true
+  },
+  {
+    "env_id": "NovGrid-LavaShortcutMaze",
+    "lava_safe": false
+  }
+]
