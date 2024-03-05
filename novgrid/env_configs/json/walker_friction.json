@@ -1,0 +1,33 @@
+[
+    {
+        "env_id": "rwrl2gym",
+        "rwrl_kwargs": {
+            "domain_name": "walker",
+            "task_name": "realworld_walk",
+            "perturb_spec": {
+                "enable": true,
+                "scheduler": "constant",
+                "param": "contact_friction",
+                "start": 0.7,
+                "min": 0.7,
+                "max": 0.7
+            }
+        }
+    },
+    {
+        "env_id": "rwrl2gym",
+        "rwrl_kwargs": {
+            "domain_name": "walker",
+            "task_name": "realworld_walk",
+            "perturb_spec": {
+                "enable": true,
+                "scheduler": "constant",
+                "param": "contact_friction",
+                "start": 0.4,
+                "min": 0.4,
+                "max": 0.4
+            }
+        }
+      }
+  ]
+  

@@ -1,0 +1,32 @@
+[
+    {
+        "env_id": "rwrl2gym",
+        "rwrl_kwargs": {
+            "domain_name": "cartpole",
+            "task_name": "realworld_swingup",
+            "perturb_spec": {
+                "enable": true,
+                "scheduler": "constant",
+                "param": "pole_length", 
+                "start": 1,
+                "min": 1, 
+                "max": 1
+            }
+        }
+    },
+    {
+        "env_id": "rwrl2gym",
+        "rwrl_kwargs": {
+            "domain_name": "cartpole",
+            "task_name": "realworld_swingup",
+            "perturb_spec": {
+                "enable": true,
+                "scheduler": "constant",
+                "param": "pole_length", 
+                "start": 2, 
+                "min": 2, 
+                "max": 2
+            }
+        }
+    }
+]
