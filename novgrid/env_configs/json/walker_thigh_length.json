@@ -8,9 +8,9 @@
                 "enable": true,
                 "scheduler": "constant",
                 "param": "thigh_length",
-                "start": 0.225,
-                "min": 0.225,
-                "max": 0.225
+                "start": 0.175,
+                "min": 0.175,
+                "max": 0.175
             }
         }
     },
@@ -23,9 +23,9 @@
                 "enable": true,
                 "scheduler": "constant",
                 "param": "thigh_length",
-                "start": 0.5,
-                "min": 0.5,
-                "max": 0.5
+                "start": 0.35,
+                "min": 0.35,
+                "max": 0.35
             }
         }
       }
