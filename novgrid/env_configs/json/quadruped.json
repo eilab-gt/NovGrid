@@ -1,0 +1,33 @@
+[
+    {
+        "env_id": "rwrl2gym",
+        "rwrl_kwargs": {
+            "domain_name": "quadruped",
+            "task_name": "realworld_walk",
+            "perturb_spec": {
+                "enable": true,
+                "scheduler": "constant",
+                "param": "shin_length",
+                "start": 0.25,
+                "min": 0.25,
+                "max": 0.25
+            }
+        }
+    },
+    {
+        "env_id": "rwrl2gym",
+        "rwrl_kwargs": {
+            "domain_name": "quadruped",
+            "task_name": "realworld_walk",
+            "perturb_spec": {
+                "enable": true,
+                "scheduler": "constant",
+                "param": "shin_length",
+                "start": 0.5,
+                "min": 0.5,
+                "max": 0.5
+            }
+        }
+    }
+  ]
+  
