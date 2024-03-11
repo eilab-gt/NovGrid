@@ -1,0 +1,14 @@
+[
+  {
+    "env_id": "MiniGrid-SimpleCrossingS9N1-v0",
+    "obstacle_type": "gridobj:Wall"
+  },
+  {
+    "env_id": "MiniGrid-SimpleCrossingS9N1-v0",
+    "obstacle_type": "gridobj:Lava"
+  },
+  {
+    "env_id": "MiniGrid-SimpleCrossingS9N1-v0",
+    "obstacle_type": "gridobj:Wall"
+  }
+]

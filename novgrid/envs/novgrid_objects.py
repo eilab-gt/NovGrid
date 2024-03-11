@@ -1,4 +1,4 @@
-from minigrid.core.world_object import Door, Key
+from minigrid.core.world_object import *
 
 class ColorDoor(Door):
     """
