@@ -9,12 +9,6 @@ STEP_DELAY = 0.0
 
 
 def make_parser() -> argparse.ArgumentParser:
-    """
-    Creates a default parser that contains everything that a novgrid environment would need.
-
-    Returns:
-        argparse.ArgumentParser: The parser
-    """
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
